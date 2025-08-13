@@ -1,6 +1,6 @@
-# Ollama Python Chat Playground
+# Ollama Python Chat Playground with different LLM models
 
-This project demonstrates three different ways to chat with a local Ollama server running the llama3.2 model using Python.
+This project demonstrates four different ways to chat with a local Ollama server running models like GPT-oss-20b, llama3.2, Qwen3, etc. using Python.
 
 ## Project Setup Instructions
 
@@ -40,6 +40,7 @@ This project demonstrates three different ways to chat with a local Ollama serve
      python "Using requests (no external Ollama client).py"
      python "Using_Official_ollama_pt_Client.py"
      python "Stream the Response with requests.py"
+     python "Ollama_GUI_Chat.py"
      ```
 
 ## Model Selection Feature
@@ -48,6 +49,7 @@ All three scripts now support easy model selection at runtime. When you start an
 
 - If you press Enter without typing a model name, the default (`llama3.2`) will be used.
 - Make sure the model is pulled and available in Ollama (`ollama list` to see available models, `ollama pull <modelname>` to download).
+- The GUI version (`Ollama_GUI_Chat.py`) provides a dropdown menu for model selection and switching.
 
 This makes it simple to experiment and chat with any model you have installed in Ollama, without editing the scripts.
 
@@ -59,7 +61,7 @@ This makes it simple to experiment and chat with any model you have installed in
 
 **Note:** By default, Ollama runs locally. The model is loaded and executed on your hardware. You can configure Ollama to use your CPU, iGPU, or GPU by setting environment variables before starting the server (see Ollama docs for details).
 
-## Script Comparison: Three Approaches
+## Script Comparison: Four Approaches
 
 ### 1. Using requests (no external Ollama client).py
 
@@ -84,24 +86,35 @@ This makes it simple to experiment and chat with any model you have installed in
 - Useful for interactive applications where immediate feedback is desired.
 - Requires only the `requests` package.
 
+### 4. Ollama_GUI_Chat.py
+
+- Provides a full graphical user interface using `tkinter`.
+- Features tabbed interface with chat, model settings, and hardware configuration.
+- Real-time model switching without restarting the application.
+- Advanced hardware detection and GPU configuration tools.
+- Built-in Intel iGPU optimization and troubleshooting features.
+- Requires the `ollama` package and `tkinter` (included with Python).
+
 ## Detailed Comparison: Pros and Cons
 
-| Feature               | Using requests (no external Ollama client) | Using Official ollama Client         | Stream the Response with requests   |
-| --------------------- | ------------------------------------------ | ------------------------------------ | ----------------------------------- |
-| **Dependencies**      | ✅ Only `requests` (minimal)               | ⚠️ Requires `ollama` package         | ✅ Only `requests` (minimal)        |
-| **Code Complexity**   | ⚠️ More verbose, manual JSON parsing       | ✅ Simple, clean, readable           | ⚠️ Moderate, manual stream handling |
-| **Error Handling**    | ✅ Full control over HTTP errors           | ⚠️ Abstracted, less granular control | ⚠️ Manual error handling needed     |
-| **Streaming Support** | ❌ No real-time streaming                  | ✅ Built-in streaming methods        | ✅ Real-time token streaming        |
-| **Future-Proofing**   | ⚠️ Manual updates for API changes          | ✅ Automatic updates with package    | ⚠️ Manual updates for API changes   |
-| **Performance**       | ✅ Direct HTTP, minimal overhead           | ⚠️ Additional abstraction layer      | ✅ Efficient streaming, low latency |
-| **Customization**     | ✅ Full control over requests              | ⚠️ Limited to client capabilities    | ✅ Full control over streaming      |
-| **Learning Value**    | ✅ Understand HTTP/JSON internals          | ⚠️ Less insight into underlying API  | ✅ Learn streaming protocols        |
-| **Production Use**    | ⚠️ Requires more error handling            | ✅ Battle-tested, robust             | ✅ Good for real-time apps          |
-| **Debugging**         | ✅ Easy to inspect raw responses           | ⚠️ Harder to debug client issues     | ✅ Can monitor stream chunks        |
+| Feature               | Using requests (no external Ollama client) | Using Official ollama Client         | Stream the Response with requests   | Ollama_GUI_Chat.py                  |
+| --------------------- | ------------------------------------------ | ------------------------------------ | ----------------------------------- | ----------------------------------- |
+| **Dependencies**      | ✅ Only `requests` (minimal)               | ⚠️ Requires `ollama` package         | ✅ Only `requests` (minimal)        | ⚠️ Requires `ollama` + `tkinter`    |
+| **Code Complexity**   | ⚠️ More verbose, manual JSON parsing       | ✅ Simple, clean, readable           | ⚠️ Moderate, manual stream handling | ⚠️ Complex GUI, many features       |
+| **Error Handling**    | ✅ Full control over HTTP errors           | ⚠️ Abstracted, less granular control | ⚠️ Manual error handling needed     | ✅ Comprehensive error handling     |
+| **Streaming Support** | ❌ No real-time streaming                  | ✅ Built-in streaming methods        | ✅ Real-time token streaming        | ✅ Built-in streaming in GUI        |
+| **Future-Proofing**   | ⚠️ Manual updates for API changes          | ✅ Automatic updates with package    | ⚠️ Manual updates for API changes   | ✅ Official client + GUI framework  |
+| **Performance**       | ✅ Direct HTTP, minimal overhead           | ⚠️ Additional abstraction layer      | ✅ Efficient streaming, low latency | ⚠️ GUI overhead, but good UX        |
+| **Customization**     | ✅ Full control over requests              | ⚠️ Limited to client capabilities    | ✅ Full control over streaming      | ✅ Highly customizable interface    |
+| **Learning Value**    | ✅ Understand HTTP/JSON internals          | ⚠️ Less insight into underlying API  | ✅ Learn streaming protocols        | ✅ Learn GUI development + AI APIs  |
+| **Production Use**    | ⚠️ Requires more error handling            | ✅ Battle-tested, robust             | ✅ Good for real-time apps          | ✅ Professional desktop application |
+| **Debugging**         | ✅ Easy to inspect raw responses           | ⚠️ Harder to debug client issues     | ✅ Can monitor stream chunks        | ✅ GUI feedback + debugging tools   |
+| **User Experience**   | ❌ Command-line only                       | ❌ Command-line only                 | ❌ Command-line only                | ✅ Intuitive graphical interface    |
+| **Hardware Control**  | ❌ No built-in GPU configuration           | ❌ No built-in GPU configuration     | ❌ No built-in GPU configuration    | ✅ Advanced GPU detection & setup   |
 
 ### When to Use Each Method:
 
-**Use requests (no external client) when:**
+**🔧 Use requests (no external client) when:**
 
 - You want minimal dependencies
 - You need full control over HTTP requests
@@ -109,7 +122,7 @@ This makes it simple to experiment and chat with any model you have installed in
 - You want to understand the API internals
 - You're working in constrained environments
 
-**Use Official ollama Client when:**
+**📦 Use Official ollama Client when:**
 
 - You want the simplest, most maintainable code
 - You need robust error handling out of the box
@@ -117,13 +130,22 @@ This makes it simple to experiment and chat with any model you have installed in
 - You're building production applications quickly
 - You prefer official, supported solutions
 
-**Use Stream with requests when:**
+**⚡ Use Stream with requests when:**
 
 - You need real-time response streaming
 - You're building interactive chat interfaces
 - You want immediate user feedback
 - You need to process responses token-by-token
 - You want minimal dependencies with streaming
+
+**🖥️ Use Ollama_GUI_Chat.py when:**
+
+- You want a professional desktop chat application
+- You need easy model switching and management
+- You want advanced hardware configuration tools
+- You're building apps for non-technical users
+- You need Intel iGPU optimization and troubleshooting
+- You prefer point-and-click over command-line interfaces
 
 ## Hardware Usage
 
@@ -141,4 +163,4 @@ This makes it simple to experiment and chat with any model you have installed in
 
 ---
 
-Feel free to use any of the three scripts to chat with your local Ollama model. Each approach offers different trade-offs in terms of control, simplicity, and streaming support.
+Feel free to use any of the four scripts to chat with your local Ollama model. Each approach offers different trade-offs in terms of control, simplicity, streaming support, and user experience. The GUI version provides the most user-friendly experience, while the command-line versions offer more technical control and learning opportunities.
