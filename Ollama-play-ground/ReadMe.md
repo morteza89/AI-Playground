@@ -84,6 +84,47 @@ This makes it simple to experiment and chat with any model you have installed in
 - Useful for interactive applications where immediate feedback is desired.
 - Requires only the `requests` package.
 
+## Detailed Comparison: Pros and Cons
+
+| Feature               | Using requests (no external Ollama client) | Using Official ollama Client         | Stream the Response with requests   |
+| --------------------- | ------------------------------------------ | ------------------------------------ | ----------------------------------- |
+| **Dependencies**      | ✅ Only `requests` (minimal)               | ⚠️ Requires `ollama` package         | ✅ Only `requests` (minimal)        |
+| **Code Complexity**   | ⚠️ More verbose, manual JSON parsing       | ✅ Simple, clean, readable           | ⚠️ Moderate, manual stream handling |
+| **Error Handling**    | ✅ Full control over HTTP errors           | ⚠️ Abstracted, less granular control | ⚠️ Manual error handling needed     |
+| **Streaming Support** | ❌ No real-time streaming                  | ✅ Built-in streaming methods        | ✅ Real-time token streaming        |
+| **Future-Proofing**   | ⚠️ Manual updates for API changes          | ✅ Automatic updates with package    | ⚠️ Manual updates for API changes   |
+| **Performance**       | ✅ Direct HTTP, minimal overhead           | ⚠️ Additional abstraction layer      | ✅ Efficient streaming, low latency |
+| **Customization**     | ✅ Full control over requests              | ⚠️ Limited to client capabilities    | ✅ Full control over streaming      |
+| **Learning Value**    | ✅ Understand HTTP/JSON internals          | ⚠️ Less insight into underlying API  | ✅ Learn streaming protocols        |
+| **Production Use**    | ⚠️ Requires more error handling            | ✅ Battle-tested, robust             | ✅ Good for real-time apps          |
+| **Debugging**         | ✅ Easy to inspect raw responses           | ⚠️ Harder to debug client issues     | ✅ Can monitor stream chunks        |
+
+### When to Use Each Method:
+
+**Use requests (no external client) when:**
+
+- You want minimal dependencies
+- You need full control over HTTP requests
+- You're building a custom wrapper
+- You want to understand the API internals
+- You're working in constrained environments
+
+**Use Official ollama Client when:**
+
+- You want the simplest, most maintainable code
+- You need robust error handling out of the box
+- You want automatic updates and new features
+- You're building production applications quickly
+- You prefer official, supported solutions
+
+**Use Stream with requests when:**
+
+- You need real-time response streaming
+- You're building interactive chat interfaces
+- You want immediate user feedback
+- You need to process responses token-by-token
+- You want minimal dependencies with streaming
+
 ## Hardware Usage
 
 - By default, Ollama runs on your CPU.
