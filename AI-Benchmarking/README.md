@@ -24,11 +24,26 @@ Both modes support:
 
 ## Installation
 
-### Step 1: Install Dependencies
+### Step 1: Set Up Environment
 
+**RECOMMENDED:** Use the pre-configured environment for exact package versions:
+
+```bash
+# Full conda environment (cross-platform)
+conda env create -f environment_ovnpu.yml
+conda activate ovnpu
+```
+
+**Alternative methods:**
+- See [QUICK_SETUP.md](QUICK_SETUP.md) for other installation options
+- See [ENVIRONMENT_SETUP.md](ENVIRONMENT_SETUP.md) for detailed setup guide
+
+**Manual installation:**
 ```bash
 pip install -r requirements.txt
 ```
+
+💡 **Tip:** The frozen environment files (`environment_ovnpu.yml`, `requirements_ovnpu_frozen.txt`) ensure consistent results across systems.
 
 ### Step 2: Prepare Your Models
 
