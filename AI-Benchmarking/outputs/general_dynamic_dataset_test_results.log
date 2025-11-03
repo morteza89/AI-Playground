@@ -1,0 +1,359 @@
+2025-11-03 10:35:03,055 - INFO - PyTorch version 2.6.0 available.
+2025-11-03 10:35:03,056 - INFO - TensorFlow version 2.19.0 available.
+2025-11-03 10:35:06,964 - WARNING - From C:\Users\m67he\.conda\envs\ovnpu\Lib\site-packages\tf_keras\src\losses.py:2976: The name tf.losses.sparse_softmax_cross_entropy is deprecated. Please use tf.compat.v1.losses.sparse_softmax_cross_entropy instead.
+
+2025-11-03 10:36:34,494 - INFO - Loading dataset: cais/mmlu
+2025-11-03 10:36:40,403 - INFO - Successfully loaded MMLU Mathematics: 100 samples
+2025-11-03 10:36:40,405 - INFO - Loading dataset: gsm8k
+2025-11-03 10:36:42,755 - INFO - Successfully loaded GSM8K Grade School Math: 1319 samples
+2025-11-03 10:36:42,755 - INFO - Loading dataset: hellaswag
+2025-11-03 10:36:45,450 - INFO - Successfully loaded HellaSwag Common Sense: 10042 samples
+2025-11-03 10:36:45,451 - INFO - === LOADING GENERAL MODELS FOR DYNAMIC DATASET TESTING ===
+2025-11-03 10:36:45,451 - INFO - HuggingFace Model: Qwen/Qwen2-7B-Instruct
+2025-11-03 10:36:45,451 - INFO - OpenVINO Model: INT4-Qwen2-7B-instruct
+2025-11-03 10:36:45,451 - INFO - Loading tokenizer...
+2025-11-03 10:36:45,789 - INFO - ✓ Tokenizer loaded
+2025-11-03 10:36:45,790 - INFO - Loading HuggingFace model...
+2025-11-03 10:36:56,178 - INFO - ✓ HuggingFace model loaded
+2025-11-03 10:36:56,179 - INFO - Loading OpenVINO model on GPU...
+2025-11-03 10:37:21,282 - INFO - ✓ OpenVINO model loaded on GPU
+2025-11-03 10:37:21,290 - INFO - Testing dataset: MMLU_Math
+2025-11-03 10:37:21,315 - INFO - Randomly sampled 20 cases from MMLU_Math
+2025-11-03 10:37:21,316 - INFO - Generating with HuggingFace: 'Question: The set of all nth roots of unity under ...'
+2025-11-03 10:37:38,598 - INFO - ✓ Generated: 'C) group
+
+Question: In the context of group theory, which property'
+2025-11-03 10:37:38,599 - INFO - Generating with OpenVINO: 'Question: The set of all nth roots of unity under ...'
+2025-11-03 10:37:39,615 - INFO - ✓ Generated: 'C Explanation: The set of all nth roots of unity forms a group under'
+2025-11-03 10:37:39,617 - INFO - Generating with HuggingFace: 'Question: Statement 1 | If R is a ring and f(x) an...'
+2025-11-03 10:37:47,127 - INFO - ✓ Generated: 'D) False, True Explanation: Statement 1 is false because the degree'
+2025-11-03 10:37:47,128 - INFO - Generating with OpenVINO: 'Question: Statement 1 | If R is a ring and f(x) an...'
+2025-11-03 10:37:48,043 - INFO - ✓ Generated: 'C Explanation: Statement 1 is false because the degree of the sum of'
+2025-11-03 10:37:48,044 - INFO - Generating with HuggingFace: 'Question: Statement 1 | A ring homomorphism is one...'
+2025-11-03 10:37:54,428 - INFO - ✓ Generated: 'A) True, True Explanation: Statement 1 is true because by definition'
+2025-11-03 10:37:54,428 - INFO - Generating with OpenVINO: 'Question: Statement 1 | A ring homomorphism is one...'
+2025-11-03 10:37:55,337 - INFO - ✓ Generated: 'C Explanation: Statement 1 is true because a ring homomorphism \('
+2025-11-03 10:37:55,338 - INFO - Generating with HuggingFace: 'Question: Statement 1 | There exists a free abelia...'
+2025-11-03 10:38:02,357 - INFO - ✓ Generated: 'C) True, False Explanation: Statement 1 is true because for any'
+2025-11-03 10:38:02,357 - INFO - Generating with OpenVINO: 'Question: Statement 1 | There exists a free abelia...'
+2025-11-03 10:38:03,203 - INFO - ✓ Generated: 'C Explanation: Statement 1 is true because for any positive integer \(n'
+2025-11-03 10:38:03,204 - INFO - Generating with HuggingFace: 'Question: If A = {1, 2, 3} then relation S = {(1, ...'
+2025-11-03 10:38:09,633 - INFO - ✓ Generated: 'C) both symmetric and anti-symmetric
+A relation R on a set'
+2025-11-03 10:38:09,633 - INFO - Generating with OpenVINO: 'Question: If A = {1, 2, 3} then relation S = {(1, ...'
+2025-11-03 10:38:10,480 - INFO - ✓ Generated: 'C) both symmetric and anti-symmetric Explanation: For a relation to be'
+2025-11-03 10:38:10,481 - INFO - Generating with HuggingFace: 'Question: Using Fermat's theorem, find the remaind...'
+2025-11-03 10:38:16,301 - INFO - ✓ Generated: 'A) 1
+
+Explanation: Fermat's Little Theorem states that'
+2025-11-03 10:38:16,301 - INFO - Generating with OpenVINO: 'Question: Using Fermat's theorem, find the remaind...'
+2025-11-03 10:38:17,069 - INFO - ✓ Generated: 'A) 1 Fermat's Little Theorem states that if p is'
+2025-11-03 10:38:17,070 - INFO - Generating with HuggingFace: 'Question: The element (4, 2) of Z_12 x Z_8 has ord...'
+2025-11-03 10:38:22,704 - INFO - ✓ Generated: 'A) 4
+
+Solution:
+
+To find the order of an element in'
+2025-11-03 10:38:22,705 - INFO - Generating with OpenVINO: 'Question: The element (4, 2) of Z_12 x Z_8 has ord...'
+2025-11-03 10:38:23,514 - INFO - ✓ Generated: 'B Explanation: The order of an element \( (a, b) \'
+2025-11-03 10:38:23,515 - INFO - Generating with HuggingFace: 'Question: Statement 1 | Every solvable group is of...'
+2025-11-03 10:38:29,542 - INFO - ✓ Generated: 'D) False, True Explanation: Statement 1 is false because not every'
+2025-11-03 10:38:29,543 - INFO - Generating with OpenVINO: 'Question: Statement 1 | Every solvable group is of...'
+2025-11-03 10:38:30,371 - INFO - ✓ Generated: 'C Explanation: Statement 1 is false because not every solvable group has'
+2025-11-03 10:38:30,371 - INFO - Generating with HuggingFace: 'Question: How many homomorphisms are there of Z in...'
+2025-11-03 10:38:35,934 - INFO - ✓ Generated: 'B) 2
+
+Explanation: 
+
+A homomorphism from a group'
+2025-11-03 10:38:35,934 - INFO - Generating with OpenVINO: 'Question: How many homomorphisms are there of Z in...'
+2025-11-03 10:38:36,786 - INFO - ✓ Generated: 'B) 2 Explanation: The group of integers, \( \mathbb'
+2025-11-03 10:38:36,787 - INFO - Generating with HuggingFace: 'Question: Find all cosets of the subgroup 4Z of 2Z...'
+2025-11-03 10:38:42,563 - INFO - ✓ Generated: 'B) 4Z, 2 + 4Z Explanation: The'
+2025-11-03 10:38:42,563 - INFO - Generating with OpenVINO: 'Question: Find all cosets of the subgroup 4Z of 2Z...'
+2025-11-03 10:38:43,333 - INFO - ✓ Generated: 'B Explanation: The subgroup \(4\mathbb{Z}\) consists'
+2025-11-03 10:38:43,334 - INFO - Generating with HuggingFace: 'Question: Statement 1 | Some abelian group of orde...'
+2025-11-03 10:38:50,735 - INFO - ✓ Generated: 'We should dissect this issue piece by piece.
+Answer: D) False,'
+2025-11-03 10:38:50,735 - INFO - Generating with OpenVINO: 'Question: Statement 1 | Some abelian group of orde...'
+2025-11-03 10:38:51,502 - INFO - ✓ Generated: 'We refer to the relevant definitions and theorems to answer these statements.'
+2025-11-03 10:38:51,503 - INFO - Generating with HuggingFace: 'Question: Statement 1 | A factor group of a non-Ab...'
+2025-11-03 10:38:58,307 - INFO - ✓ Generated: 'D) False, True Explanation: Statement 1: This statement is false'
+2025-11-03 10:38:58,307 - INFO - Generating with OpenVINO: 'Question: Statement 1 | A factor group of a non-Ab...'
+2025-11-03 10:38:59,119 - INFO - ✓ Generated: 'C Explanation: Statement 1 is false because the factor group (also known'
+2025-11-03 10:38:59,120 - INFO - Generating with HuggingFace: 'Question: Find the maximum possible order for an e...'
+2025-11-03 10:39:04,770 - INFO - ✓ Generated: 'The order of an element in a symmetric group \(S_n\) is determined'
+2025-11-03 10:39:04,771 - INFO - Generating with OpenVINO: 'Question: Find the maximum possible order for an e...'
+2025-11-03 10:39:05,575 - INFO - ✓ Generated: 'The order of an element in \(S_n\) is determined by its cycle'
+2025-11-03 10:39:05,576 - INFO - Generating with HuggingFace: 'Question: In the group G = {2, 4, 6, 8) under mult...'
+2025-11-03 10:39:11,462 - INFO - ✓ Generated: 'D) 2
+
+Question: If a group G has an order of'
+2025-11-03 10:39:11,463 - INFO - Generating with OpenVINO: 'Question: In the group G = {2, 4, 6, 8) under mult...'
+2025-11-03 10:39:12,272 - INFO - ✓ Generated: 'D) 2 Explanation: The identity element in a group under multiplication modulo'
+2025-11-03 10:39:12,273 - INFO - Generating with HuggingFace: 'Question: Find the degree for the given field exte...'
+2025-11-03 10:39:17,836 - INFO - ✓ Generated: 'C) 2
+
+Question: If a polynomial f(x) in Q'
+2025-11-03 10:39:17,836 - INFO - Generating with OpenVINO: 'Question: Find the degree for the given field exte...'
+2025-11-03 10:39:18,582 - INFO - ✓ Generated: 'C Explanation: The field extension Q(sqrt(2)*sqrt(3))'
+2025-11-03 10:39:18,583 - INFO - Generating with HuggingFace: 'Question: Compute the product in the given ring. (...'
+2025-11-03 10:39:24,170 - INFO - ✓ Generated: 'C) 4
+
+Answer this question:
+
+Question 3  Compute the'
+2025-11-03 10:39:24,170 - INFO - Generating with OpenVINO: 'Question: Compute the product in the given ring. (...'
+2025-11-03 10:39:24,914 - INFO - ✓ Generated: 'A) 0 Explanation: In modular arithmetic, when you multiply two numbers'
+2025-11-03 10:39:24,915 - INFO - Generating with HuggingFace: 'Question: The inverse of -i in the multiplicative ...'
+2025-11-03 10:39:30,572 - INFO - ✓ Generated: 'C) i Explanation: In a multiplicative group, the inverse of an'
+2025-11-03 10:39:30,572 - INFO - Generating with OpenVINO: 'Question: The inverse of -i in the multiplicative ...'
+2025-11-03 10:39:31,368 - INFO - ✓ Generated: 'C) i Explanation: In a multiplicative group, the inverse of an'
+2025-11-03 10:39:31,368 - INFO - Generating with HuggingFace: 'Question: Find all zeros in the indicated finite f...'
+2025-11-03 10:39:37,439 - INFO - ✓ Generated: 'D) 6
+A) 1
+B) 2'
+2025-11-03 10:39:37,440 - INFO - Generating with OpenVINO: 'Question: Find all zeros in the indicated finite f...'
+2025-11-03 10:39:38,269 - INFO - ✓ Generated: 'D) 6
+We refer to the solution provided by @mathg'
+2025-11-03 10:39:38,269 - INFO - Generating with HuggingFace: 'Question: A subset H of a group (G,*) is a group i...'
+2025-11-03 10:39:44,602 - INFO - ✓ Generated: 'The correct answer is all of the above. For a subset H of a'
+2025-11-03 10:39:44,602 - INFO - Generating with OpenVINO: 'Question: A subset H of a group (G,*) is a group i...'
+2025-11-03 10:39:45,434 - INFO - ✓ Generated: 'The correct answer is all of the above. All of these conditions are necessary'
+2025-11-03 10:39:45,435 - INFO - Generating with HuggingFace: 'Question: If A = (1, 2, 3, 4). Let ~= {(1, 2), (1,...'
+2025-11-03 10:39:51,721 - INFO - ✓ Generated: 'A) not anti-symmetric
+A relation on a set is considered anti'
+2025-11-03 10:39:51,722 - INFO - Generating with OpenVINO: 'Question: If A = (1, 2, 3, 4). Let ~= {(1, 2), (1,...'
+2025-11-03 10:39:52,560 - INFO - ✓ Generated: 'B) transitive Explanation: For a relation to be transitive, if'
+2025-11-03 10:39:52,561 - INFO - Dataset MMLU_Math completed: HF=70.0%, OV=70.0%
+2025-11-03 10:39:52,561 - INFO - Testing dataset: GSM8K_Problems
+2025-11-03 10:39:52,565 - INFO - Randomly sampled 20 cases from GSM8K_Problems
+2025-11-03 10:39:52,566 - INFO - Generating with HuggingFace: 'Question: Deandre caught 3 tunas last Monday, the ...'
+2025-11-03 10:39:59,396 - INFO - ✓ Generated: 'First, let's calculate the total weight of the tunas that Deandre'
+2025-11-03 10:39:59,396 - INFO - Generating with OpenVINO: 'Question: Deandre caught 3 tunas last Monday, the ...'
+2025-11-03 10:40:00,194 - INFO - ✓ Generated: 'First, let's calculate the total weight of the tunas that Deandre'
+2025-11-03 10:40:00,194 - INFO - Generating with HuggingFace: 'Question: When the water is cold Ray swims a mile ...'
+2025-11-03 10:40:06,444 - INFO - ✓ Generated: 'Twice 16 minutes is 2*16 = 32'
+2025-11-03 10:40:06,445 - INFO - Generating with OpenVINO: 'Question: When the water is cold Ray swims a mile ...'
+2025-11-03 10:40:07,219 - INFO - ✓ Generated: 'Twice the time it takes Ray to swim a mile in warm water is'
+2025-11-03 10:40:07,220 - INFO - Generating with HuggingFace: 'Question: Linus works for a trading company. He bu...'
+2025-11-03 10:40:13,825 - INFO - ✓ Generated: 'Linus bought 2 mobile devices last Monday at $20 each,'
+2025-11-03 10:40:13,825 - INFO - Generating with OpenVINO: 'Question: Linus works for a trading company. He bu...'
+2025-11-03 10:40:14,609 - INFO - ✓ Generated: 'Linus bought 2 mobile devices last Monday at $20 each,'
+2025-11-03 10:40:14,610 - INFO - Generating with HuggingFace: 'Question: There are four birds at the Caboose. Sal...'
+2025-11-03 10:40:21,093 - INFO - ✓ Generated: 'If Sally Thirtytwo is 8 years old, then Sally Four, who'
+2025-11-03 10:40:21,093 - INFO - Generating with OpenVINO: 'Question: There are four birds at the Caboose. Sal...'
+2025-11-03 10:40:21,883 - INFO - ✓ Generated: 'If Sally Thirtytwo is 8 years old, then Sally Four is also'
+2025-11-03 10:40:21,884 - INFO - Generating with HuggingFace: 'Question: A mother goes shopping. She buys cocoa a...'
+2025-11-03 10:40:28,092 - INFO - ✓ Generated: 'First, we need to calculate the total cost of the items she bought:'
+2025-11-03 10:40:28,092 - INFO - Generating with OpenVINO: 'Question: A mother goes shopping. She buys cocoa a...'
+2025-11-03 10:40:28,931 - INFO - ✓ Generated: 'First, let's calculate the total amount spent by the mother on her purchases'
+2025-11-03 10:40:28,932 - INFO - Generating with HuggingFace: 'Question: John fills a 6 foot by 4 foot pool that ...'
+2025-11-03 10:40:34,718 - INFO - ✓ Generated: 'First, we need to calculate the volume of the pool to determine how many'
+2025-11-03 10:40:34,718 - INFO - Generating with OpenVINO: 'Question: John fills a 6 foot by 4 foot pool that ...'
+2025-11-03 10:40:35,480 - INFO - ✓ Generated: 'First, we need to calculate the volume of the pool to determine how much'
+2025-11-03 10:40:35,481 - INFO - Generating with HuggingFace: 'Question: Billy is buying some candy with $10 his ...'
+2025-11-03 10:40:42,192 - INFO - ✓ Generated: 'Billy starts with $10 and spends it all on candy. Let's'
+2025-11-03 10:40:42,192 - INFO - Generating with OpenVINO: 'Question: Billy is buying some candy with $10 his ...'
+2025-11-03 10:40:42,988 - INFO - ✓ Generated: 'Billy spent $10 - x dollars on candy, where x is the'
+2025-11-03 10:40:42,988 - INFO - Generating with HuggingFace: 'Question: Katarina has 5 less cookies than Max has...'
+2025-11-03 10:40:49,205 - INFO - ✓ Generated: 'If Katarina has 68 cookies and she has 5 less'
+2025-11-03 10:40:49,205 - INFO - Generating with OpenVINO: 'Question: Katarina has 5 less cookies than Max has...'
+2025-11-03 10:40:49,981 - INFO - ✓ Generated: 'If Katarina has 68 cookies and she has 5 less'
+2025-11-03 10:40:49,981 - INFO - Generating with HuggingFace: 'Question: Steve decides to start eating more tomat...'
+2025-11-03 10:40:56,392 - INFO - ✓ Generated: 'If Steve eats 6 cherry tomatoes per day, and he eats twice as'
+2025-11-03 10:40:56,392 - INFO - Generating with OpenVINO: 'Question: Steve decides to start eating more tomat...'
+2025-11-03 10:40:57,186 - INFO - ✓ Generated: 'If Steve eats 6 cherry tomatoes per day, and he eats twice as'
+2025-11-03 10:40:57,187 - INFO - Generating with HuggingFace: 'Question: 4 adults and 8 children are to share 8 p...'
+2025-11-03 10:41:03,405 - INFO - ✓ Generated: 'First, let's calculate the total number of chocolate bars available:
+
+\[8'
+2025-11-03 10:41:03,405 - INFO - Generating with OpenVINO: 'Question: 4 adults and 8 children are to share 8 p...'
+2025-11-03 10:41:04,183 - INFO - ✓ Generated: 'First, let's calculate the total number of chocolate bars available:
+
+Each packet'
+2025-11-03 10:41:04,184 - INFO - Generating with HuggingFace: 'Question: Toby is reading a book that is 45 pages ...'
+2025-11-03 10:41:11,509 - INFO - ✓ Generated: 'The book is 45*200 = 900'
+2025-11-03 10:41:11,510 - INFO - Generating with OpenVINO: 'Question: Toby is reading a book that is 45 pages ...'
+2025-11-03 10:41:12,362 - INFO - ✓ Generated: 'The book is 45*200 = 900'
+2025-11-03 10:41:12,362 - INFO - Generating with HuggingFace: 'Question: A fog bank rolls in from the ocean to co...'
+2025-11-03 10:41:19,141 - INFO - ✓ Generated: 'To find out how long it will take for the fog bank to cover the'
+2025-11-03 10:41:19,142 - INFO - Generating with OpenVINO: 'Question: A fog bank rolls in from the ocean to co...'
+2025-11-03 10:41:19,953 - INFO - ✓ Generated: 'To find out how long it will take for the fog bank to cover the'
+2025-11-03 10:41:19,954 - INFO - Generating with HuggingFace: 'Question: Rayna has 60 more dollars than Kassidy, ...'
+2025-11-03 10:41:27,326 - INFO - ✓ Generated: 'Kassidy has 3/4 * 120 ='
+2025-11-03 10:41:27,327 - INFO - Generating with OpenVINO: 'Question: Rayna has 60 more dollars than Kassidy, ...'
+2025-11-03 10:41:28,191 - INFO - ✓ Generated: '```python
+from sympy import *
+
+# Define the amount of money Aure'
+2025-11-03 10:41:28,191 - INFO - Generating with HuggingFace: 'Question: Britany records 18 4-minute TikTok video...'
+2025-11-03 10:41:35,448 - INFO - ✓ Generated: 'Britany spends 18*4 = 72 minutes each week'
+2025-11-03 10:41:35,449 - INFO - Generating with OpenVINO: 'Question: Britany records 18 4-minute TikTok video...'
+2025-11-03 10:41:36,226 - INFO - ✓ Generated: 'First, let's calculate the total time Britany spends on TikTok activities'
+2025-11-03 10:41:36,228 - INFO - Generating with HuggingFace: 'Question: Six years ago, when Noah was half as old...'
+2025-11-03 10:41:43,217 - INFO - ✓ Generated: 'If Cera is currently 46 years old, then six years ago'
+2025-11-03 10:41:43,217 - INFO - Generating with OpenVINO: 'Question: Six years ago, when Noah was half as old...'
+2025-11-03 10:41:44,052 - INFO - ✓ Generated: 'If Cera is currently 46 years old, six years ago she'
+2025-11-03 10:41:44,053 - INFO - Generating with HuggingFace: 'Question: A bag of flour is divided into 8 portion...'
+2025-11-03 10:41:49,932 - INFO - ✓ Generated: 'Each portion of flour is 2 kilograms. Therefore, one bag contains'
+2025-11-03 10:41:49,932 - INFO - Generating with OpenVINO: 'Question: A bag of flour is divided into 8 portion...'
+2025-11-03 10:41:50,702 - INFO - ✓ Generated: 'Each portion is 2 kilograms, so one bag contains 8 portions *'
+2025-11-03 10:41:50,702 - INFO - Generating with HuggingFace: 'Question: Carly had 80 cards, 2/5 of the cards had...'
+2025-11-03 10:41:57,844 - INFO - ✓ Generated: 'Carly had 80*(2/5) = 32 cards'
+2025-11-03 10:41:57,845 - INFO - Generating with OpenVINO: 'Question: Carly had 80 cards, 2/5 of the cards had...'
+2025-11-03 10:41:58,617 - INFO - ✓ Generated: 'Carly had 80*(2/5) = 32 cards'
+2025-11-03 10:41:58,618 - INFO - Generating with HuggingFace: 'Question: Mark buys a fleet of 12 cars for his com...'
+2025-11-03 10:42:05,505 - INFO - ✓ Generated: 'Mark buys 12 cars at $20,000 each'
+2025-11-03 10:42:05,506 - INFO - Generating with OpenVINO: 'Question: Mark buys a fleet of 12 cars for his com...'
+2025-11-03 10:42:06,325 - INFO - ✓ Generated: 'Mark buys 12 cars at $20,000 each'
+2025-11-03 10:42:06,326 - INFO - Generating with HuggingFace: 'Question: Brendan has a bag of marbles with 10 ins...'
+2025-11-03 10:42:14,271 - INFO - ✓ Generated: 'Brendan started with 10 marbles. He dropped half of them when'
+2025-11-03 10:42:14,272 - INFO - Generating with OpenVINO: 'Question: Brendan has a bag of marbles with 10 ins...'
+2025-11-03 10:42:15,112 - INFO - ✓ Generated: 'Brendan started with 10 marbles.
+
+He dropped half of them when'
+2025-11-03 10:42:15,114 - INFO - Generating with HuggingFace: 'Question: Mark has $50 in his bank account. He ear...'
+2025-11-03 10:42:21,439 - INFO - ✓ Generated: 'Mark needs to save $300 for the bike. He starts with'
+2025-11-03 10:42:21,439 - INFO - Generating with OpenVINO: 'Question: Mark has $50 in his bank account. He ear...'
+2025-11-03 10:42:22,281 - INFO - ✓ Generated: 'Mark needs to save up $300 for the bike. He currently'
+2025-11-03 10:42:22,282 - INFO - Dataset GSM8K_Problems completed: HF=10.0%, OV=5.0%
+2025-11-03 10:42:22,282 - INFO - Testing dataset: HellaSwag_Reasoning
+2025-11-03 10:42:22,301 - INFO - Randomly sampled 20 cases from HellaSwag_Reasoning
+2025-11-03 10:42:22,302 - INFO - Generating with HuggingFace: 'Question: A close up of a box of ice cream is show...'
+2025-11-03 10:42:31,461 - INFO - ✓ Generated: 'The answer is B) leads into the bowl and turns towards a bearded'
+2025-11-03 10:42:31,462 - INFO - Generating with OpenVINO: 'Question: A close up of a box of ice cream is show...'
+2025-11-03 10:42:32,347 - INFO - ✓ Generated: 'The answer is B) leads into the bowl and turns towards a bearded'
+2025-11-03 10:42:32,349 - INFO - Generating with HuggingFace: 'Question: [header] How to use autoshapes in word [...'
+2025-11-03 10:42:43,766 - INFO - ✓ Generated: 'The correct sequence of steps to use autoshapes in Word is:
+
+1'
+2025-11-03 10:42:43,766 - INFO - Generating with OpenVINO: 'Question: [header] How to use autoshapes in word [...'
+2025-11-03 10:42:44,711 - INFO - ✓ Generated: 'To use autoshapes in Word effectively:
+
+1. **Explore the Auto'
+2025-11-03 10:42:44,712 - INFO - Generating with HuggingFace: 'Question: [header] How to make lips plumper (cinna...'
+2025-11-03 10:42:56,646 - INFO - ✓ Generated: '] Mix together 1 teaspoon of cinnamon and 2 teaspoons of sugar until'
+2025-11-03 10:42:56,649 - INFO - Generating with OpenVINO: 'Question: [header] How to make lips plumper (cinna...'
+2025-11-03 10:42:57,583 - INFO - ✓ Generated: '] Mix together equal parts sugar and cinnamon until you have a thick paste.'
+2025-11-03 10:42:57,584 - INFO - Generating with HuggingFace: 'Question: She starts by demonstrating a dry method...'
+2025-11-03 10:43:06,505 - INFO - ✓ Generated: 'The most appropriate continuation of the scenario based on the context provided is:
+
+C'
+2025-11-03 10:43:06,505 - INFO - Generating with OpenVINO: 'Question: She starts by demonstrating a dry method...'
+2025-11-03 10:43:07,351 - INFO - ✓ Generated: 'The answer is C) proceeded to show several different products are best at properly'
+2025-11-03 10:43:07,352 - INFO - Generating with HuggingFace: 'Question: [header] How to store knee high boots [t...'
+2025-11-03 10:43:19,683 - INFO - ✓ Generated: 'the boots by the tops of the boots and place them on top of each'
+2025-11-03 10:43:19,684 - INFO - Generating with OpenVINO: 'Question: [header] How to store knee high boots [t...'
+2025-11-03 10:43:20,552 - INFO - ✓ Generated: 'the magazine and place it on top of the boots. E) ) ['
+2025-11-03 10:43:20,553 - INFO - Generating with HuggingFace: 'Question: [header] How to define your cheekbones [...'
+2025-11-03 10:43:32,546 - INFO - ✓ Generated: 'your skin. D) [substeps] Highlighter: apply a small'
+2025-11-03 10:43:32,548 - INFO - Generating with OpenVINO: 'Question: [header] How to define your cheekbones [...'
+2025-11-03 10:43:33,392 - INFO - ✓ Generated: 'your nose bridge. D) [substeps] Highlighter: apply a'
+2025-11-03 10:43:33,393 - INFO - Generating with HuggingFace: 'Question: There's a woman with red colored hair we...'
+2025-11-03 10:43:42,849 - INFO - ✓ Generated: 'D) Swiftly skates through the crowded streets as she passes by several'
+2025-11-03 10:43:42,850 - INFO - Generating with OpenVINO: 'Question: There's a woman with red colored hair we...'
+2025-11-03 10:43:43,685 - INFO - ✓ Generated: 'D) Swiftly skates through the crowded streets as she passes by several'
+2025-11-03 10:43:43,687 - INFO - Generating with HuggingFace: 'Question: A boy stands holding a stick. A man thro...'
+2025-11-03 10:43:50,727 - INFO - ✓ Generated: 'The answer is B) sits in front of a wall calendar, because humans'
+2025-11-03 10:43:50,728 - INFO - Generating with OpenVINO: 'Question: A boy stands holding a stick. A man thro...'
+2025-11-03 10:43:51,520 - INFO - ✓ Generated: 'We refer to Wikipedia articles on psychology for help in answering this question. The'
+2025-11-03 10:43:51,521 - INFO - Generating with HuggingFace: 'Question: [header] How to handle caffeine overdose...'
+2025-11-03 10:44:03,456 - INFO - ✓ Generated: '22) is available 24 hours a day, 7 days'
+2025-11-03 10:44:03,457 - INFO - Generating with OpenVINO: 'Question: [header] How to handle caffeine overdose...'
+2025-11-03 10:44:04,315 - INFO - ✓ Generated: '22) is available 24 hours a day, seven days a'
+2025-11-03 10:44:04,316 - INFO - Generating with HuggingFace: 'Question: A man is seen sitting down and speaking ...'
+2025-11-03 10:44:12,809 - INFO - ✓ Generated: 'The most likely scenario based on common practices and behaviors associated with using a hook'
+2025-11-03 10:44:12,809 - INFO - Generating with OpenVINO: 'Question: A man is seen sitting down and speaking ...'
+2025-11-03 10:44:13,668 - INFO - ✓ Generated: 'D) takes a puff from the pipe while speaking to the camera and hands'
+2025-11-03 10:44:13,669 - INFO - Generating with HuggingFace: 'Question: [header] How to wear dad hats [title] Tr...'
+2025-11-03 10:44:25,673 - INFO - ✓ Generated: 'to see how they look and feel. [step] Put the hat on'
+2025-11-03 10:44:25,674 - INFO - Generating with OpenVINO: 'Question: [header] How to wear dad hats [title] Tr...'
+2025-11-03 10:44:26,511 - INFO - ✓ Generated: 'to see how they look and feel. [step] Put the hat on'
+2025-11-03 10:44:26,512 - INFO - Generating with HuggingFace: 'Question: A man places a tile onto the floor and p...'
+2025-11-03 10:44:34,474 - INFO - ✓ Generated: 'A) then uses an old pipe to adjust it and uses more wood and'
+2025-11-03 10:44:34,474 - INFO - Generating with OpenVINO: 'Question: A man places a tile onto the floor and p...'
+2025-11-03 10:44:35,307 - INFO - ✓ Generated: 'A man cannot push down a tile and use a crane to pull it away'
+2025-11-03 10:44:35,308 - INFO - Generating with HuggingFace: 'Question: [header] How to make your butt bigger fa...'
+2025-11-03 10:44:47,130 - INFO - ✓ Generated: 'seconds, then push yourself back up. Repeat 10-15'
+2025-11-03 10:44:47,132 - INFO - Generating with OpenVINO: 'Question: [header] How to make your butt bigger fa...'
+2025-11-03 10:44:47,979 - INFO - ✓ Generated: 'seconds before rising again.
+
+Answer:
+
+To make your butt bigger faster, incorporating'
+2025-11-03 10:44:47,980 - INFO - Generating with HuggingFace: 'Question: [header] How to stretch a shirt [title] ...'
+2025-11-03 10:44:59,751 - INFO - ✓ Generated: 'back into shape. Hang your shirt up to dry after washing it. E'
+2025-11-03 10:44:59,755 - INFO - Generating with OpenVINO: 'Question: [header] How to stretch a shirt [title] ...'
+2025-11-03 10:45:00,593 - INFO - ✓ Generated: 'back into its original shape. E) [title] Stretch the shirt while'
+2025-11-03 10:45:00,594 - INFO - Generating with HuggingFace: 'Question: Between matches the people all go out in...'
+2025-11-03 10:45:09,916 - INFO - ✓ Generated: 'C) are seen separately receiving a white box from a man, while they'
+2025-11-03 10:45:09,917 - INFO - Generating with OpenVINO: 'Question: Between matches the people all go out in...'
+2025-11-03 10:45:10,802 - INFO - ✓ Generated: 'C) are seen separately receiving a white box from a man, while they'
+2025-11-03 10:45:10,803 - INFO - Generating with HuggingFace: 'Question: [header] How to choose dress trousers fo...'
+2025-11-03 10:45:22,581 - INFO - ✓ Generated: 'the time preferred pleats over zippers. [title] Consider the material'
+2025-11-03 10:45:22,584 - INFO - Generating with OpenVINO: 'Question: [header] How to choose dress trousers fo...'
+2025-11-03 10:45:23,422 - INFO - ✓ Generated: 'all ages wore them. [title] Select the waist size based on your'
+2025-11-03 10:45:23,424 - INFO - Generating with HuggingFace: 'Question: A boy in an orange shirt is playing a vi...'
+2025-11-03 10:45:30,470 - INFO - ✓ Generated: 'A) zooms in on the controller. Explanation: The question describes a'
+2025-11-03 10:45:30,470 - INFO - Generating with OpenVINO: 'Question: A boy in an orange shirt is playing a vi...'
+2025-11-03 10:45:31,195 - INFO - ✓ Generated: 'A
+Answer:
+
+A) zooms in on the controller.'
+2025-11-03 10:45:31,196 - INFO - Generating with HuggingFace: 'Question: [header] How to install winamp [title] D...'
+2025-11-03 10:45:42,985 - INFO - ✓ Generated: 'to install it. E) [title] Select your language and click next'
+2025-11-03 10:45:42,987 - INFO - Generating with OpenVINO: 'Question: [header] How to install winamp [title] D...'
+2025-11-03 10:45:43,836 - INFO - ✓ Generated: 'to install it. E) [title] Select your language and click next'
+2025-11-03 10:45:43,837 - INFO - Generating with HuggingFace: 'Question: [header] How to grow hollyhocks [title] ...'
+2025-11-03 10:45:55,716 - INFO - ✓ Generated: 'of the stalks will vary from 3 feet (0.9 m'
+2025-11-03 10:45:55,717 - INFO - Generating with OpenVINO: 'Question: [header] How to grow hollyhocks [title] ...'
+2025-11-03 10:45:56,556 - INFO - ✓ Generated: 'of the plants will vary depending on the variety purchased. D) [title'
+2025-11-03 10:45:56,557 - INFO - Generating with HuggingFace: 'Question: [header] How to end an email [title] Rea...'
+2025-11-03 10:46:08,255 - INFO - ✓ Generated: ', if you're writing to a friend about a vacation, you might say'
+2025-11-03 10:46:08,257 - INFO - Generating with OpenVINO: 'Question: [header] How to end an email [title] Rea...'
+2025-11-03 10:46:09,095 - INFO - ✓ Generated: ', if you're sending an email to a friend who has been in touch'
+2025-11-03 10:46:09,096 - INFO - Dataset HellaSwag_Reasoning completed: HF=75.0%, OV=85.0%
+2025-11-03 10:46:09,096 - INFO - Measuring performance for HuggingFace
+2025-11-03 10:46:09,097 - INFO - Generating with HuggingFace_perf: 'What is 7 + 5? Answer:...'
+2025-11-03 10:46:11,870 - INFO - ✓ Generated: '12
+
+# Year 3'
+2025-11-03 10:46:11,870 - INFO - HuggingFace perf run 1: 2.77s, 4 tokens, 693.2ms/token
+2025-11-03 10:46:11,870 - INFO - Generating with HuggingFace_perf: 'The capital of Italy is? Answer:...'
+2025-11-03 10:46:14,804 - INFO - ✓ Generated: 'The capital of Italy is Rome. Rome'
+2025-11-03 10:46:14,805 - INFO - HuggingFace perf run 2: 2.93s, 7 tokens, 419.2ms/token
+2025-11-03 10:46:14,805 - INFO - Generating with HuggingFace_perf: 'When crossing a street, look? Answer:...'
+2025-11-03 10:46:17,709 - INFO - ✓ Generated: 'Look both ways before crossing the street.'
+2025-11-03 10:46:17,710 - INFO - HuggingFace perf run 3: 2.91s, 7 tokens, 415.0ms/token
+2025-11-03 10:46:17,711 - INFO - Measuring performance for OpenVINO
+2025-11-03 10:46:17,711 - INFO - Generating with OpenVINO_perf: 'What is 7 + 5? Answer:...'
+2025-11-03 10:46:18,248 - INFO - ✓ Generated: '12
+
+What is 8'
+2025-11-03 10:46:18,249 - INFO - OpenVINO perf run 1: 0.54s, 4 tokens, 134.3ms/token
+2025-11-03 10:46:18,249 - INFO - Generating with OpenVINO_perf: 'The capital of Italy is? Answer:...'
+2025-11-03 10:46:18,754 - INFO - ✓ Generated: 'Rome. Step 1: Identify the'
+2025-11-03 10:46:18,755 - INFO - OpenVINO perf run 2: 0.51s, 5 tokens, 101.2ms/token
+2025-11-03 10:46:18,755 - INFO - Generating with OpenVINO_perf: 'When crossing a street, look? Answer:...'
+2025-11-03 10:46:19,224 - INFO - ✓ Generated: 'Look both ways before crossing the street.'
+2025-11-03 10:46:19,224 - INFO - OpenVINO perf run 3: 0.47s, 7 tokens, 66.9ms/token
+2025-11-03 10:46:19,228 - INFO - === COMPREHENSIVE GENERAL MODEL RESULTS ===
+2025-11-03 10:46:19,228 - INFO - HuggingFace Model: Qwen/Qwen2-7B-Instruct
+2025-11-03 10:46:19,228 - INFO - OpenVINO Model: INT4-Qwen2-7B-instruct
+2025-11-03 10:46:19,228 - INFO - Hardware: GPU
+2025-11-03 10:46:19,229 - INFO - Total Random Samples: 60
+2025-11-03 10:46:19,229 - INFO - Overall HF Accuracy: 51.7% (31/60)
+2025-11-03 10:46:19,229 - INFO - Overall OV Accuracy: 53.3% (32/60)
+2025-11-03 10:46:19,229 - INFO - Overall Accuracy Delta: 1.7%
+2025-11-03 10:46:19,229 - INFO - === GENERAL MODEL DATASET SUMMARY ===
+2025-11-03 10:46:19,229 - INFO - MMLU Mathematics (cais/mmlu): 20/100 random samples
+2025-11-03 10:46:19,229 - INFO -   HF=70.0%, OV=70.0%, Delta=0.0%
+2025-11-03 10:46:19,230 - INFO - GSM8K Grade School Math (gsm8k): 20/1319 random samples
+2025-11-03 10:46:19,230 - INFO -   HF=10.0%, OV=5.0%, Delta=-5.0%
+2025-11-03 10:46:19,230 - INFO - HellaSwag Common Sense (hellaswag): 20/10042 random samples
+2025-11-03 10:46:19,230 - INFO -   HF=75.0%, OV=85.0%, Delta=10.0%
+2025-11-03 10:46:19,231 - INFO - HF Performance: TTFT=2.77s, Throughput=2.1, TokenLatency=509.2ms
+2025-11-03 10:46:19,231 - INFO - OV Performance: TTFT=0.54s, Throughput=10.6, TokenLatency=100.8ms
+2025-11-03 10:46:19,231 - INFO - Token Latency Improvement: 5.1x faster
+2025-11-03 10:46:19,231 - INFO - Assessment: 🟡 REQUIRES REVIEW

@@ -9,8 +9,8 @@ venv/
 env/
 ENV/
 
-# Log files
-*.log
+# Log files (exclude all except example outputs)
+# *.log files are allowed for example outputs
 
 # Model directories (too large for git)
 ov_*/
