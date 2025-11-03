@@ -1,0 +1,44 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# Log files
+*.log
+
+# Model directories (too large for git)
+ov_*/
+INT4-*/
+INT8-*/
+FP16-*/
+*.onnx
+*.bin
+*.xml
+
+# Dataset cache
+.cache/
+cache/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# HuggingFace cache
+.huggingface/
+
+# Test outputs
+test_results/
+benchmark_results/
