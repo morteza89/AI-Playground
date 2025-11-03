@@ -290,9 +290,20 @@ Contributions are welcome. Please ensure:
 - New features include appropriate documentation
 - Testing is performed on multiple hardware configurations
 
+## Additional Documentation
+
+For more detailed information, see the documentation in the `docs/` folder:
+
+- **[Quick Start Guide](docs/QUICKSTART.md)** - Step-by-step beginner tutorial
+- **[Model Examples](docs/EXAMPLES.md)** - Configuration examples for popular models
+- **[Folder Structure](docs/FOLDER_STRUCTURE.md)** - Detailed project organization
+
+Example outputs from real benchmark runs are available in the `outputs/` folder.
+
 ## Support
 
 For issues or questions:
 - Check the troubleshooting section above
 - Review log files for detailed error information
+- Consult the additional documentation in the `docs/` folder
 - Open an issue on the GitHub repository

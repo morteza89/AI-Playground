@@ -91,7 +91,7 @@ class GeneralDynamicPublicDatasetTester:
         print()
 
         # HuggingFace model selection
-        print("🤗 HUGGINGFACE MODEL SELECTION:")
+        print(" HUGGINGFACE MODEL SELECTION:")
         print("Examples:")
         print("  • meta-llama/Meta-Llama-3.1-8B")
         print("  • Qwen/Qwen2-7B-Instruct")
@@ -112,7 +112,7 @@ class GeneralDynamicPublicDatasetTester:
         print()
 
         # OpenVINO model selection
-        print("⚡ OPENVINO MODEL SELECTION:")
+        print(" OPENVINO MODEL SELECTION:")
         print("Provide the path to your OpenVINO quantized model directory")
         print("Examples:")
         print("  • ./ov_qwen2-7b_int8")
@@ -134,19 +134,19 @@ class GeneralDynamicPublicDatasetTester:
                     break
                 else:
                     # Ask if user wants to proceed anyway (model might be created later)
-                    proceed = input(f"⚠️  Path '{ov_path}' not found. Continue anyway? (y/N): ").strip().lower()
+                    proceed = input(f"  Path '{ov_path}' not found. Continue anyway? (y/N): ").strip().lower()
                     if proceed in ['y', 'yes']:
                         self.openvino_model_path = ov_path
-                        print(f"⚠️  OpenVINO Model: {self.openvino_model_path} (not verified)")
+                        print(f"  OpenVINO Model: {self.openvino_model_path} (not verified)")
                         break
                     else:
                         print("Please provide a valid path or create the OpenVINO model first")
             else:
-                print("❌ Please provide a model path")
+                print(" Please provide a model path")
 
         # Model configuration summary
         print()
-        print("📋 MODEL CONFIGURATION SUMMARY:")
+        print(" MODEL CONFIGURATION SUMMARY:")
         print(f"  HuggingFace Model: {self.hf_model_id}")
         print(f"  OpenVINO Model:    {self.openvino_model_path}")
         print()
@@ -157,7 +157,7 @@ class GeneralDynamicPublicDatasetTester:
             print("Configuration cancelled. Restart to try again.")
             return False
 
-        print("✅ Model configuration confirmed!")
+        print(" Model configuration confirmed!")
         return True
 
     def hardware_selection(self):
@@ -240,7 +240,7 @@ class GeneralDynamicPublicDatasetTester:
 
         for dataset_key, config in self.dataset_configs.items():
             try:
-                print(f"📥 Loading {config['name']}...")
+                print(f" Loading {config['name']}...")
                 logger.info(f"Loading dataset: {config['dataset_name']}")
 
                 if config['subset']:
@@ -254,21 +254,21 @@ class GeneralDynamicPublicDatasetTester:
                     "total_samples": len(dataset)
                 }
 
-                print(f"✅ {config['name']}: {len(dataset)} samples available")
+                print(f" {config['name']}: {len(dataset)} samples available")
                 logger.info(f"Successfully loaded {config['name']}: {len(dataset)} samples")
 
             except Exception as e:
-                print(f"❌ Failed to load {config['name']}: {str(e)}")
+                print(f" Failed to load {config['name']}: {str(e)}")
                 logger.error(f"Failed to load {config['dataset_name']}: {str(e)}")
                 # Remove failed dataset from configs
                 if dataset_key in self.loaded_datasets:
                     del self.loaded_datasets[dataset_key]
 
         if not self.loaded_datasets:
-            print("❌ No datasets loaded successfully!")
+            print(" No datasets loaded successfully!")
             return False
 
-        print(f"\n✅ Successfully loaded {len(self.loaded_datasets)} datasets")
+        print(f"\n Successfully loaded {len(self.loaded_datasets)} datasets")
         print("Ready for random sampling...")
         return True
 
@@ -286,7 +286,7 @@ class GeneralDynamicPublicDatasetTester:
             if self.tokenizer.pad_token is None:
                 self.tokenizer.pad_token = self.tokenizer.eos_token
             logger.info("✓ Tokenizer loaded")
-            print("✅ Tokenizer loaded")
+            print(" Tokenizer loaded")
 
             # Load HuggingFace model
             logger.info("Loading HuggingFace model...")
@@ -301,7 +301,7 @@ class GeneralDynamicPublicDatasetTester:
                 )
             except Exception as e:
                 logger.warning(f"Failed with device_map='auto', trying CPU: {e}")
-                print("⚠️ Trying CPU fallback for HuggingFace model...")
+                print(" Trying CPU fallback for HuggingFace model...")
                 self.hf_model = AutoModelForCausalLM.from_pretrained(
                     self.hf_model_id,
                     torch_dtype=torch.float16,
@@ -309,7 +309,7 @@ class GeneralDynamicPublicDatasetTester:
                 )
 
             logger.info("✓ HuggingFace model loaded")
-            print("✅ HuggingFace model loaded")
+            print(" HuggingFace model loaded")
 
             # Load OpenVINO model with device selection
             logger.info(f"Loading OpenVINO model on {self.device}...")
@@ -329,15 +329,15 @@ class GeneralDynamicPublicDatasetTester:
                     )
                     actual_device = config["device"]
                     logger.info(f"✓ OpenVINO model loaded on {actual_device}")
-                    print(f"✅ OpenVINO model loaded on {actual_device}")
+                    print(f" OpenVINO model loaded on {actual_device}")
                     if actual_device != self.device:
                         logger.warning(f"Using {actual_device} instead of {self.device}")
-                        print(f"⚠️ Using {actual_device} instead of {self.device}")
+                        print(f" Using {actual_device} instead of {self.device}")
                         self.device = actual_device
                     break
                 except Exception as e:
                     logger.warning(f"Failed on {config['device']}: {str(e)}")
-                    print(f"⚠️ Failed on {config['device']}: {str(e)}")
+                    print(f" Failed on {config['device']}: {str(e)}")
                     if i == len(device_options) - 1:
                         raise e
 
@@ -345,7 +345,7 @@ class GeneralDynamicPublicDatasetTester:
 
         except Exception as e:
             logger.error(f"Model loading failed: {str(e)}")
-            print(f"❌ Model loading failed: {str(e)}")
+            print(f" Model loading failed: {str(e)}")
             print("Please check:")
             print(f"  • HuggingFace model ID: {self.hf_model_id}")
             print(f"  • OpenVINO model path: {self.openvino_model_path}")
@@ -509,7 +509,7 @@ class GeneralDynamicPublicDatasetTester:
         ov_correct = 0
 
         for i, sample in enumerate(random_samples, 1):
-            print(f"🎲 Random Sample {i}/{len(random_samples)}: {dataset_key}")
+            print(f" Random Sample {i}/{len(random_samples)}: {dataset_key}")
 
             # Format the question
             formatted_question = self.format_question(sample, dataset_key)
@@ -536,8 +536,8 @@ class GeneralDynamicPublicDatasetTester:
                 ov_correct += 1
 
             # Display results
-            hf_status = "✅ PASS" if hf_correct_flag else "❌ FAIL"
-            ov_status = "✅ PASS" if ov_correct_flag else "❌ FAIL"
+            hf_status = " PASS" if hf_correct_flag else " FAIL"
+            ov_status = " PASS" if ov_correct_flag else " FAIL"
 
             print(f"  HF: '{hf_response}' → {hf_status}")
             print(f"  OV: '{ov_response}' → {ov_status}")
@@ -574,7 +574,7 @@ class GeneralDynamicPublicDatasetTester:
             }
         }
 
-        print(f"📊 {config['name']} Random Sample Results:")
+        print(f" {config['name']} Random Sample Results:")
         print(f"  HuggingFace: {hf_correct}/{total_samples} ({hf_accuracy:.1f}%)")
         print(f"  OpenVINO:    {ov_correct}/{total_samples} ({ov_accuracy:.1f}%)")
         print(f"  Source: {total_samples}/{self.loaded_datasets[dataset_key]['total_samples']} randomly selected")
@@ -663,7 +663,7 @@ class GeneralDynamicPublicDatasetTester:
 
         # Load real datasets
         if not self.load_datasets():
-            print("❌ Failed to load datasets")
+            print(" Failed to load datasets")
             return
 
         print("=" * 80)
@@ -681,8 +681,8 @@ class GeneralDynamicPublicDatasetTester:
             return
 
         load_time = time.time() - start_time
-        print(f"✅ Models loaded in {load_time:.1f} seconds")
-        print(f"✅ OpenVINO running on: {self.device}")
+        print(f" Models loaded in {load_time:.1f} seconds")
+        print(f" OpenVINO running on: {self.device}")
 
         # Test each dataset with random samples
         all_results = {}
@@ -717,18 +717,18 @@ class GeneralDynamicPublicDatasetTester:
         print("COMPREHENSIVE GENERAL MODEL RESULTS")
         print("=" * 80)
 
-        print(f"🤖 MODEL COMPARISON:")
+        print(f" MODEL COMPARISON:")
         print(f"  HuggingFace: {self.hf_model_id}")
         print(f"  OpenVINO:    {os.path.basename(self.openvino_model_path)}")
         print(f"  Hardware:    {self.device}")
         print()
 
-        print(f"📊 OVERALL ACCURACY ({total_samples} random samples total):")
+        print(f" OVERALL ACCURACY ({total_samples} random samples total):")
         print(f"  HuggingFace: {total_hf_correct}/{total_samples} ({overall_hf_accuracy:.1f}%)")
         print(f"  OpenVINO:    {total_ov_correct}/{total_samples} ({overall_ov_accuracy:.1f}%)")
         print()
 
-        print("📈 DATASET BREAKDOWN (Random Samples):")
+        print(" DATASET BREAKDOWN (Random Samples):")
         for dataset_key, result in all_results.items():
             config = self.loaded_datasets[dataset_key]["config"]
             samples_per_dataset = result['total_samples']
@@ -738,7 +738,7 @@ class GeneralDynamicPublicDatasetTester:
             print(f"    HF: {result['hf_correct']}/{samples_per_dataset} ({result['hf_accuracy']:.1f}%) | OV: {result['ov_correct']}/{samples_per_dataset} ({result['ov_accuracy']:.1f}%)")
         print()
 
-        print("⚡ PERFORMANCE METRICS:")
+        print(" PERFORMANCE METRICS:")
         print("  HuggingFace:")
         print(f"    TTFT: {hf_perf['ttft']:.2f}s | Throughput: {hf_perf['throughput']:.1f} tok/s")
         print(f"    Token Latency: {hf_perf['token_latency']:.1f}ms | Avg Token Latency: {hf_perf['avg_token_latency']:.1f}ms")
@@ -752,7 +752,7 @@ class GeneralDynamicPublicDatasetTester:
             ttft_speedup = hf_perf['ttft'] / ov_perf['ttft']
             throughput_speedup = ov_perf['throughput'] / hf_perf['throughput'] if hf_perf['throughput'] > 0 else 0
             token_latency_improvement = hf_perf['avg_token_latency'] / ov_perf['avg_token_latency'] if ov_perf['avg_token_latency'] > 0 else 0
-            print("🚀 PERFORMANCE IMPROVEMENTS:")
+            print(" PERFORMANCE IMPROVEMENTS:")
             print(f"  TTFT: {ttft_speedup:.1f}x faster")
             print(f"  Throughput: {throughput_speedup:.1f}x faster")
             print(f"  Token Latency: {token_latency_improvement:.1f}x faster ({hf_perf['avg_token_latency']:.1f}ms → {ov_perf['avg_token_latency']:.1f}ms)")
@@ -763,24 +763,24 @@ class GeneralDynamicPublicDatasetTester:
         performance_improvement = ov_perf['throughput'] > hf_perf['throughput']
 
         if overall_ov_accuracy >= accuracy_threshold and performance_improvement:
-            verdict = "🟢 PRODUCTION READY"
+            verdict = " PRODUCTION READY"
             recommendation = f"OpenVINO model shows {overall_ov_accuracy:.1f}% accuracy on random samples with significant performance gains. Suitable for production deployment."
         elif overall_ov_accuracy >= 50:
-            verdict = "🟡 REQUIRES REVIEW"
+            verdict = " REQUIRES REVIEW"
             recommendation = f"OpenVINO model shows {overall_ov_accuracy:.1f}% accuracy on random samples. Consider more extensive evaluation before production."
         else:
-            verdict = "🔴 NEEDS IMPROVEMENT"
+            verdict = " NEEDS IMPROVEMENT"
             recommendation = f"OpenVINO model accuracy ({overall_ov_accuracy:.1f}%) on random samples below production threshold. Review quantization settings."
 
-        print(f"🎯 PRODUCTION ASSESSMENT: {verdict}")
-        print(f"📋 RECOMMENDATION: {recommendation}")
+        print(f" PRODUCTION ASSESSMENT: {verdict}")
+        print(f" RECOMMENDATION: {recommendation}")
         print()
 
         # COMPREHENSIVE DATASET SUMMARY
         print("=" * 80)
         print("GENERAL MODEL DYNAMIC DATASET SUMMARY")
         print("=" * 80)
-        print(f"🤖 MODEL EVALUATION OVERVIEW:")
+        print(f" MODEL EVALUATION OVERVIEW:")
         print(f"  • HuggingFace Model: {self.hf_model_id}")
         print(f"  • OpenVINO Model: {os.path.basename(self.openvino_model_path)}")
         print(f"  • Real Datasets Loaded: {len(self.loaded_datasets)}")
@@ -790,7 +790,7 @@ class GeneralDynamicPublicDatasetTester:
         print("  • Fresh Random Selection Each Run")
         print()
 
-        print("📊 DATASET-BY-DATASET RESULTS:")
+        print(" DATASET-BY-DATASET RESULTS:")
         for dataset_key, result in all_results.items():
             config = self.loaded_datasets[dataset_key]["config"]
             accuracy_diff = result['ov_accuracy'] - result['hf_accuracy']
@@ -810,7 +810,7 @@ class GeneralDynamicPublicDatasetTester:
                 print(f"      Accuracy Delta: {accuracy_diff:.1f}% (Equal Performance)")
             print()
 
-        print("🎯 OVERALL SUMMARY:")
+        print(" OVERALL SUMMARY:")
         print(f"  • Overall HuggingFace Accuracy: {overall_hf_accuracy:.1f}% ({total_hf_correct}/{total_samples})")
         print(f"  • Overall OpenVINO Accuracy:    {overall_ov_accuracy:.1f}% ({total_ov_correct}/{total_samples})")
         overall_accuracy_diff = overall_ov_accuracy - overall_hf_accuracy
@@ -856,20 +856,20 @@ class GeneralDynamicPublicDatasetTester:
         logger.info(f"Token Latency Improvement: {hf_perf['avg_token_latency'] / ov_perf['avg_token_latency'] if ov_perf['avg_token_latency'] > 0 else 0:.1f}x faster")
         logger.info(f"Assessment: {verdict}")
 
-        print(f"💾 Complete results saved to: {log_file}")
-        print("✅ General dynamic dataset testing completed successfully!")
-        print("💡 Run again for different random samples or try different models!")
+        print(f" Complete results saved to: {log_file}")
+        print(" General dynamic dataset testing completed successfully!")
+        print(" Run again for different random samples or try different models!")
 
 
 def main():
     """Main execution"""
     try:
         if not torch_available or not datasets_available:
-            print("❌ Required libraries not available")
+            print(" Required libraries not available")
             print("Please install: pip install datasets transformers optimum[openvino] torch")
             return
 
-        print("🚀 GENERAL DYNAMIC PUBLIC DATASET MODEL TESTER")
+        print(" GENERAL DYNAMIC PUBLIC DATASET MODEL TESTER")
         print("Compare ANY HuggingFace model vs OpenVINO quantized version")
         print("Real dataset loading with random sampling each run")
         print("Datasets: MMLU, GSM8K, HellaSwag")
@@ -879,9 +879,9 @@ def main():
         tester.run_general_dynamic_dataset_test()
 
     except KeyboardInterrupt:
-        print("\n⚠️ Test interrupted by user")
+        print("\n Test interrupted by user")
     except Exception as e:
-        print(f"❌ Error: {str(e)}")
+        print(f" Error: {str(e)}")
         logger.error(f"Error: {str(e)}")
         logger.error(f"Traceback: {traceback.format_exc()}")
 
