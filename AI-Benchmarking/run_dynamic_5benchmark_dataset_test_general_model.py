@@ -522,14 +522,18 @@ class General5BenchmarkDynamicDatasetTester:
             # Direct question format
             return f"Question: {sample['question']} Answer:"
 
-    def generate_response(self, model, prompt: str, model_name: str, max_tokens: int = 15) -> str:
+    def generate_response(self, model, prompt: str, model_name: str, max_tokens: int = 15, dataset_key: str = "") -> str:
         """Generate response using proven working method with adaptive token length"""
         try:
-            # Adaptive token length based on task type
+            # Adaptive token length based on task type and dataset
             if "Code:" in prompt:
                 max_tokens = 50  # More tokens for coding tasks
+            elif dataset_key == "GSM8K_Problems":
+                # GSM8K math problems ALWAYS need more tokens for complete multi-step reasoning
+                max_tokens = 150  # Increased to allow full reasoning chains regardless of question length
             elif "Question:" in prompt and len(prompt) > 200:
-                max_tokens = 25  # Medium tokens for complex questions
+                # Other long questions
+                max_tokens = 150
             else:
                 max_tokens = 15  # Standard tokens for simple questions
 
@@ -591,6 +595,54 @@ class General5BenchmarkDynamicDatasetTester:
             return False
 
         response_lower = response.lower().strip()
+
+        # Special validation for GSM8K - extract numbers from response
+        if dataset_key == "GSM8K_Problems":
+            for pattern in expected_patterns:
+                pattern_str = str(pattern).strip()
+                
+                # Strategy 1: Look for final answer indicators (most reliable)
+                # These patterns capture the number after conclusive statements
+                final_answer_patterns = [
+                    r'(?:the\s+)?(?:answer|total|result|sum)\s+(?:is|equals?|=|:)\s*\$?\s*(\d+(?:\.\d+)?)',
+                    r'(?:receives?|gets?|earns?|makes?|has|have)\s+(?:a\s+total\s+of\s+)?\$?\s*(\d+(?:\.\d+)?)\s*(?:dollars?|pens?|books?|apples?|euros?)?[\.,;\s]*$',
+                    r'total\s+(?:of\s+)?(?:is|equals?|=|:)?\s*\\?\[?\$?\s*(\d+(?:\.\d+)?)',
+                    r'=\s*\$?\s*(\d+(?:\.\d+)?)\s*(?:dollars?|pens?|books?|apples?)?[\.,;\s]*$',
+                ]
+                
+                response_lower = response.lower()
+                for final_pattern in final_answer_patterns:
+                    matches = re.findall(final_pattern, response_lower, re.MULTILINE)
+                    if matches:
+                        # Check if the expected answer is in the captured numbers
+                        for match in matches:
+                            if pattern_str == match or pattern_str in match:
+                                return True
+                
+                # Strategy 2: Check last complete sentence for a number
+                # Split by periods, find the last sentence with a number
+                sentences = response.split('.')
+                for sentence in reversed(sentences):
+                    sentence_numbers = re.findall(r'\b\d+(?:\.\d+)?\b', sentence)
+                    if sentence_numbers:
+                        # The last number in the last sentence with numbers is likely the answer
+                        if pattern_str == sentence_numbers[-1]:
+                            return True
+                        break
+                
+                # Strategy 3: Check last few numbers in entire response
+                all_numbers = re.findall(r'\b\d+(?:\.\d+)?\b', response)
+                if all_numbers:
+                    # Check last 5 numbers (in case answer appears in final calculation)
+                    last_numbers = all_numbers[-5:]
+                    if pattern_str in last_numbers:
+                        return True
+                
+                # Strategy 4: Simple substring match (fallback)
+                if pattern_str in response:
+                    return True
+            
+            return False
 
         # Special validation for coding tasks
         if dataset_key == "MBPP_Coding":
@@ -657,8 +709,8 @@ class General5BenchmarkDynamicDatasetTester:
                 print(f"Expected: {expected_display}")
 
             # Generate responses
-            hf_response = self.generate_response(self.hf_model, formatted_question, "HuggingFace")
-            ov_response = self.generate_response(self.ov_model, formatted_question, "OpenVINO")
+            hf_response = self.generate_response(self.hf_model, formatted_question, "HuggingFace", dataset_key=dataset_key)
+            ov_response = self.generate_response(self.ov_model, formatted_question, "OpenVINO", dataset_key=dataset_key)
 
             # Validate responses
             hf_correct_flag = self.validate_response(hf_response, sample['expected_patterns'], dataset_key)

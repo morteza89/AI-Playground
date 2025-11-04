@@ -123,7 +123,7 @@ class OpenVINOGenAI5BenchmarkTester:
             if ov_path:
                 # Normalize path
                 ov_path = os.path.normpath(ov_path)
-                
+
                 # Check if path exists
                 if os.path.exists(ov_path):
                     self.openvino_model_path = ov_path
@@ -148,13 +148,13 @@ class OpenVINOGenAI5BenchmarkTester:
         print(f"  Library: openvino_genai (optimized pipeline)")
         print("  Benchmarks: MMLU, GSM8K, HellaSwag, MBPP (Coding), TruthfulQA (Honesty)")
         print()
-        
+
         # Confirmation
         confirm = input("Proceed with this 5-benchmark GenAI configuration? (Y/n): ").strip().lower()
         if confirm in ['n', 'no']:
             print("Configuration cancelled. Restart to try again.")
             return False
-        
+
         print("5-Benchmark OpenVINO GenAI model configuration confirmed")
         return True
 
@@ -297,10 +297,10 @@ class OpenVINOGenAI5BenchmarkTester:
                 try:
                     logger.info(f"Attempting to load on {device}...")
                     self.pipe = ov_genai.LLMPipeline(self.openvino_model_path, device)
-                    
+
                     logger.info(f"OpenVINO GenAI pipeline loaded on {device}")
                     print(f"OpenVINO GenAI pipeline loaded on {device}")
-                    
+
                     if device != self.device:
                         logger.warning(f"Using {device} instead of {self.device}")
                         print(f"Using {device} instead of {self.device}")
@@ -412,21 +412,21 @@ class OpenVINOGenAI5BenchmarkTester:
         """Extract key patterns from code for validation"""
         patterns = []
         patterns.append(code.strip())
-        
+
         # Extract function names
         function_matches = re.findall(r'def\s+(\w+)', code)
         patterns.extend(function_matches)
-        
+
         # Extract key keywords
         keywords = ['return', 'if', 'else', 'for', 'while', 'def', 'class']
         for keyword in keywords:
             if keyword in code:
                 patterns.append(keyword)
-        
+
         # Extract variable assignments
         var_matches = re.findall(r'(\w+)\s*=', code)
         patterns.extend(var_matches[:3])
-        
+
         return patterns[:10]
 
     def format_question(self, sample: dict, dataset_key: str) -> str:
@@ -445,17 +445,21 @@ class OpenVINOGenAI5BenchmarkTester:
         else:
             return f"Question: {sample['question']} Answer:"
 
-    def generate_response(self, prompt: str, max_tokens: int = 15) -> str:
+    def generate_response(self, prompt: str, max_tokens: int = 15, dataset_key: str = "") -> str:
         """Generate response using OpenVINO GenAI pipeline"""
         try:
-            # Adaptive token length based on task type
+            # Adaptive token length based on task type and dataset
             if "Code:" in prompt:
                 max_tokens = 50
+            elif dataset_key == "GSM8K_Problems":
+                # GSM8K math problems ALWAYS need more tokens for complete multi-step reasoning
+                max_tokens = 150  # Increased to allow full reasoning chains regardless of question length
             elif "Question:" in prompt and len(prompt) > 200:
-                max_tokens = 25
+                # Other long questions
+                max_tokens = 150
             else:
                 max_tokens = 15
-                
+
             logger.info(f"Generating response: '{prompt[:50]}...' (max_tokens={max_tokens})")
 
             # Configure generation parameters
@@ -466,11 +470,11 @@ class OpenVINOGenAI5BenchmarkTester:
 
             # Generate using GenAI pipeline
             response = self.pipe.generate(prompt, config)
-            
+
             # Extract only the new tokens (remove prompt)
             if response.startswith(prompt):
                 response = response[len(prompt):].strip()
-            
+
             logger.info(f"Generated: '{response[:100]}...'")
             return response if response else "Empty"
 
@@ -485,19 +489,67 @@ class OpenVINOGenAI5BenchmarkTester:
 
         response_lower = response.lower().strip()
 
+        # Special validation for GSM8K - extract numbers from response
+        if dataset_key == "GSM8K_Problems":
+            for pattern in expected_patterns:
+                pattern_str = str(pattern).strip()
+                
+                # Strategy 1: Look for final answer indicators (most reliable)
+                # These patterns capture the number after conclusive statements
+                final_answer_patterns = [
+                    r'(?:the\s+)?(?:answer|total|result|sum)\s+(?:is|equals?|=|:)\s*\$?\s*(\d+(?:\.\d+)?)',
+                    r'(?:receives?|gets?|earns?|makes?|has|have)\s+(?:a\s+total\s+of\s+)?\$?\s*(\d+(?:\.\d+)?)\s*(?:dollars?|pens?|books?|apples?|euros?)?[\.,;\s]*$',
+                    r'total\s+(?:of\s+)?(?:is|equals?|=|:)?\s*\\?\[?\$?\s*(\d+(?:\.\d+)?)',
+                    r'=\s*\$?\s*(\d+(?:\.\d+)?)\s*(?:dollars?|pens?|books?|apples?)?[\.,;\s]*$',
+                ]
+                
+                response_lower = response.lower()
+                for final_pattern in final_answer_patterns:
+                    matches = re.findall(final_pattern, response_lower, re.MULTILINE)
+                    if matches:
+                        # Check if the expected answer is in the captured numbers
+                        for match in matches:
+                            if pattern_str == match or pattern_str in match:
+                                return True
+                
+                # Strategy 2: Check last complete sentence for a number
+                # Split by periods, find the last sentence with a number
+                sentences = response.split('.')
+                for sentence in reversed(sentences):
+                    sentence_numbers = re.findall(r'\b\d+(?:\.\d+)?\b', sentence)
+                    if sentence_numbers:
+                        # The last number in the last sentence with numbers is likely the answer
+                        if pattern_str == sentence_numbers[-1]:
+                            return True
+                        break
+                
+                # Strategy 3: Check last few numbers in entire response
+                all_numbers = re.findall(r'\b\d+(?:\.\d+)?\b', response)
+                if all_numbers:
+                    # Check last 5 numbers (in case answer appears in final calculation)
+                    last_numbers = all_numbers[-5:]
+                    if pattern_str in last_numbers:
+                        return True
+                
+                # Strategy 4: Simple substring match (fallback)
+                if pattern_str in response:
+                    return True
+            
+            return False
+
         # Special validation for coding tasks
         if dataset_key == "MBPP_Coding":
             code_indicators = ['def', 'return', 'if', 'for', 'while', '=', 'print']
             has_code_structure = any(indicator in response_lower for indicator in code_indicators)
-            
+
             pattern_match = False
             for pattern in expected_patterns:
                 if str(pattern).lower().strip() in response_lower:
                     pattern_match = True
                     break
-            
+
             return has_code_structure or pattern_match
-        
+
         # Standard validation
         for pattern in expected_patterns:
             if str(pattern).lower().strip() in response_lower:
@@ -532,7 +584,7 @@ class OpenVINOGenAI5BenchmarkTester:
 
             # Format the question
             formatted_question = self.format_question(sample, dataset_key)
-            
+
             # Show question
             question_display = sample['question'][:150] + '...' if len(sample['question']) > 150 else sample['question']
             print(f"Q: {question_display}")
@@ -547,7 +599,7 @@ class OpenVINOGenAI5BenchmarkTester:
                 print(f"Expected: {expected_display}")
 
             # Generate response
-            response = self.generate_response(formatted_question)
+            response = self.generate_response(formatted_question, dataset_key=dataset_key)
 
             # Validate response
             is_correct = self.validate_response(response, sample['expected_patterns'], dataset_key)
@@ -721,7 +773,7 @@ class OpenVINOGenAI5BenchmarkTester:
             category = dataset_result['category']
             if category not in category_results:
                 category_results[category] = {'correct': 0, 'total': 0}
-            
+
             category_results[category]['correct'] += dataset_result['correct']
             category_results[category]['total'] += dataset_result['total_samples']
 
@@ -810,7 +862,7 @@ class OpenVINOGenAI5BenchmarkTester:
         print("CAPABILITY-BY-CAPABILITY RESULTS:")
         for category, results in category_results.items():
             cat_accuracy = (results['correct'] / results['total']) * 100 if results['total'] > 0 else 0
-            
+
             print(f"   {category}:")
             print(f"      Test Cases: {results['total']} random samples")
             print(f"      Accuracy: {cat_accuracy:.1f}% ({results['correct']}/{results['total']})")
