@@ -1,7 +1,7 @@
 """
-OpenVINO Model 5-Benchmark Dataset Tester
+General Dynamic 5-Benchmark Dataset Model Tester - HuggingFace vs OpenVINO GenAI
+Compares HuggingFace models against OpenVINO GenAI library (optimized pipeline)
 Dynamically loads actual public datasets and randomly selects samples for testing
-Benchmarks OpenVINO quantized models only (no HuggingFace comparison)
 5 Comprehensive Benchmarks: MMLU, GSM8K, HellaSwag, MBPP (Coding), TruthfulQA (Honesty)
 No hardcoded examples - fresh random selection each run
 """
@@ -18,23 +18,28 @@ logger = logging.getLogger(__name__)
 
 try:
     import torch
-    from transformers import AutoTokenizer
-    from optimum.intel.openvino import OVModelForCausalLM
+    from transformers import AutoTokenizer, AutoModelForCausalLM
+    import openvino_genai as ov_genai
     from datasets import load_dataset
     torch_available = True
+    genai_available = True
     datasets_available = True
 except ImportError as e:
     logger.error(f"Import error: {e}")
     torch_available = False
+    genai_available = False
     datasets_available = False
 
 
-class OpenVINO5BenchmarkTester:
+class General5BenchmarkHFvsGenAITester:
     def __init__(self):
+        self.hf_model_id = None
         self.openvino_model_path = None
         self.device = "CPU"
+
         self.tokenizer = None
-        self.ov_model = None
+        self.hf_model = None
+        self.genai_pipe = None
 
         # Comprehensive 5-Dataset configurations
         self.dataset_configs = {
@@ -99,7 +104,7 @@ class OpenVINO5BenchmarkTester:
         os.makedirs(outputs_dir, exist_ok=True)
 
         # Set log file path
-        self.log_file = os.path.join(outputs_dir, "openvino_5benchmark_test_results.log")
+        self.log_file = os.path.join(outputs_dir, "general_5benchmark_hf_vs_genai_test_results.log")
 
         # Configure logging
         logging.basicConfig(
@@ -116,16 +121,35 @@ class OpenVINO5BenchmarkTester:
         logger.info(f"Log file: {self.log_file}")
 
     def model_selection(self):
-        """Get OpenVINO model selection from user"""
+        """Get model selection from user"""
         print("=" * 80)
-        print("OPENVINO 5-BENCHMARK MODEL EVALUATION")
+        print("HUGGINGFACE vs OPENVINO GENAI 5-BENCHMARK COMPARISON")
         print("=" * 80)
-        print("Benchmark OpenVINO quantized model on 5 comprehensive datasets")
+        print("Compare HuggingFace model against OpenVINO GenAI optimized pipeline")
         print("Benchmarks: MMLU + GSM8K + HellaSwag + MBPP (Coding) + TruthfulQA (Honesty)")
         print()
 
-        # OpenVINO model selection
-        print("OPENVINO MODEL SELECTION:")
+        # HuggingFace model selection
+        print("HUGGINGFACE MODEL SELECTION:")
+        print("Provide the HuggingFace model ID")
+        print("Examples:")
+        print("  • Qwen/Qwen2-7B-Instruct")
+        print("  • meta-llama/Llama-3.1-8B-Instruct")
+        print("  • microsoft/Phi-3-mini-4k-instruct")
+        print("  • google/gemma-2-2b-it")
+        print()
+
+        while True:
+            hf_id = input("Enter HuggingFace model ID: ").strip()
+            if hf_id:
+                self.hf_model_id = hf_id
+                print(f"HuggingFace Model: {self.hf_model_id}")
+                break
+            else:
+                print("Please provide a model ID")
+
+        # OpenVINO GenAI model selection
+        print("\nOPENVINO GENAI MODEL SELECTION:")
         print("Provide the path to your OpenVINO quantized model directory")
         print("Examples:")
         print("  • ./ov_qwen2-7b_int8")
@@ -143,14 +167,14 @@ class OpenVINO5BenchmarkTester:
                 # Check if path exists
                 if os.path.exists(ov_path):
                     self.openvino_model_path = ov_path
-                    print(f"OpenVINO Model: {self.openvino_model_path}")
+                    print(f"OpenVINO GenAI Model: {self.openvino_model_path}")
                     break
                 else:
                     # Ask if user wants to proceed anyway
                     proceed = input(f"Path '{ov_path}' not found. Continue anyway? (y/N): ").strip().lower()
                     if proceed in ['y', 'yes']:
                         self.openvino_model_path = ov_path
-                        print(f"OpenVINO Model: {self.openvino_model_path} (not verified)")
+                        print(f"OpenVINO GenAI Model: {self.openvino_model_path} (not verified)")
                         break
                     else:
                         print("Please provide a valid path or create the OpenVINO model first")
@@ -159,23 +183,25 @@ class OpenVINO5BenchmarkTester:
 
         # Model configuration summary
         print()
-        print("5-BENCHMARK MODEL CONFIGURATION SUMMARY:")
-        print(f"  OpenVINO Model: {self.openvino_model_path}")
+        print("5-BENCHMARK COMPARISON MODEL CONFIGURATION SUMMARY:")
+        print(f"  HuggingFace Model: {self.hf_model_id}")
+        print(f"  OpenVINO GenAI Model: {self.openvino_model_path}")
+        print(f"  OpenVINO Library: openvino_genai (optimized pipeline)")
         print("  Benchmarks: MMLU, GSM8K, HellaSwag, MBPP (Coding), TruthfulQA (Honesty)")
         print()
 
         # Confirmation
-        confirm = input("Proceed with this 5-benchmark configuration? (Y/n): ").strip().lower()
+        confirm = input("Proceed with this 5-benchmark HF vs GenAI comparison? (Y/n): ").strip().lower()
         if confirm in ['n', 'no']:
             print("Configuration cancelled. Restart to try again.")
             return False
 
-        print("5-Benchmark OpenVINO model configuration confirmed")
+        print("5-Benchmark HF vs GenAI comparison configuration confirmed")
         return True
 
     def hardware_selection(self):
         """Get hardware selection"""
-        print("\nHARDWARE SELECTION:")
+        print("\nHARDWARE SELECTION (for OpenVINO GenAI):")
         print("1. CPU (Most Stable)")
         print("2. iGPU (Intel Graphics)")
         print("3. NPU (Neural Processing Unit)")
@@ -293,59 +319,58 @@ class OpenVINO5BenchmarkTester:
         print("Ready for random sampling...")
         return True
 
-    def load_model(self):
-        """Load OpenVINO model with device selection"""
+    def load_models(self):
+        """Load both HuggingFace and OpenVINO GenAI models"""
         try:
-            logger.info("=== LOADING OPENVINO MODEL FOR 5-BENCHMARK TESTING ===")
-            logger.info(f"OpenVINO Model: {self.openvino_model_path}")
+            logger.info("=== LOADING GENERAL MODELS FOR 5-BENCHMARK DATASET TESTING ===")
+            logger.info(f"HuggingFace Model: {self.hf_model_id}")
+            logger.info(f"OpenVINO GenAI Model: {self.openvino_model_path}")
 
-            # Use model directory for tokenizer
-            tokenizer_path = self.openvino_model_path
-
-            # Try to load tokenizer from the model directory
+            # Load tokenizer
             logger.info("Loading tokenizer...")
-            print(f"Loading tokenizer from {tokenizer_path}...")
+            print(f"Loading tokenizer from: {self.hf_model_id}")
+            self.tokenizer = AutoTokenizer.from_pretrained(self.hf_model_id, trust_remote_code=True)
+            logger.info("✓ Tokenizer loaded")
+            print("✓ Tokenizer loaded")
 
-            try:
-                self.tokenizer = AutoTokenizer.from_pretrained(tokenizer_path, trust_remote_code=True)
-            except Exception as e:
-                logger.warning(f"Failed to load tokenizer from model path: {e}")
-                print(f"Failed to load tokenizer from {tokenizer_path}")
-                print("Please ensure the model directory contains tokenizer files")
-                return False
+            # Load HuggingFace model
+            logger.info("Loading HuggingFace model...")
+            print(f"Loading HuggingFace model: {self.hf_model_id}")
+            self.hf_model = AutoModelForCausalLM.from_pretrained(
+                self.hf_model_id,
+                torch_dtype=torch.float16,
+                device_map="auto",
+                trust_remote_code=True
+            )
+            logger.info("✓ HuggingFace model loaded")
+            print("✓ HuggingFace model loaded")
 
-            if self.tokenizer.pad_token is None:
-                self.tokenizer.pad_token = self.tokenizer.eos_token
-            logger.info("Tokenizer loaded")
-            print("Tokenizer loaded")
-
-            # Load OpenVINO model with device selection
-            logger.info(f"Loading OpenVINO model on {self.device}...")
-            print(f"Loading OpenVINO model from: {self.openvino_model_path}")
+            # Load OpenVINO GenAI pipeline
+            logger.info("Loading OpenVINO GenAI pipeline...")
+            print(f"Loading OpenVINO GenAI pipeline from: {self.openvino_model_path}")
             print(f"Target device: {self.device}")
 
             device_options = [
-                {"device": self.device},
-                {"device": "CPU"}  # fallback
+                self.device,
+                "CPU"  # fallback
             ]
 
-            for i, config in enumerate(device_options):
+            for i, device in enumerate(device_options):
                 try:
-                    self.ov_model = OVModelForCausalLM.from_pretrained(
-                        self.openvino_model_path,
-                        **config
-                    )
-                    actual_device = config["device"]
-                    logger.info(f"OpenVINO model loaded on {actual_device}")
-                    print(f"OpenVINO model loaded on {actual_device}")
-                    if actual_device != self.device:
-                        logger.warning(f"Using {actual_device} instead of {self.device}")
-                        print(f"Using {actual_device} instead of {self.device}")
-                        self.device = actual_device
+                    logger.info(f"Attempting to load on {device}...")
+                    self.genai_pipe = ov_genai.LLMPipeline(self.openvino_model_path, device)
+
+                    logger.info(f"✓ OpenVINO GenAI pipeline loaded on {device}")
+                    print(f"✓ OpenVINO GenAI pipeline loaded on {device}")
+
+                    if device != self.device:
+                        logger.warning(f"Using {device} instead of {self.device}")
+                        print(f"Using {device} instead of {self.device}")
+                        self.device = device
                     break
                 except Exception as e:
-                    logger.warning(f"Failed on {config['device']}: {str(e)}")
-                    print(f"Failed on {config['device']}: {str(e)}")
+                    logger.warning(f"Failed on {device}: {str(e)}")
+                    print(f"Failed on {device}: {str(e)}")
                     if i == len(device_options) - 1:
                         raise e
 
@@ -355,9 +380,9 @@ class OpenVINO5BenchmarkTester:
             logger.error(f"Model loading failed: {str(e)}")
             print(f"Model loading failed: {str(e)}")
             print("Please check:")
-            print(f"  • OpenVINO model path: {self.openvino_model_path}")
+            print(f"  • HuggingFace model ID: {self.hf_model_id}")
+            print(f"  • OpenVINO GenAI model path: {self.openvino_model_path}")
             print("  • Model files exist and are valid")
-            print("  • Tokenizer files are present in the model directory")
             return False
 
     def sample_random_data(self, dataset_key: str) -> list:
@@ -482,22 +507,22 @@ class OpenVINO5BenchmarkTester:
         else:
             return f"Question: {sample['question']} Answer:"
 
-    def generate_response(self, prompt: str, max_tokens: int = 15, dataset_key: str = "") -> str:
-        """Generate response using OpenVINO model"""
+    def generate_hf_response(self, prompt: str, max_tokens: int = 15, dataset_key: str = "") -> str:
+        """Generate response using HuggingFace model"""
         try:
             # Adaptive token length based on task type and dataset
             if "Code:" in prompt:
                 max_tokens = 50
             elif dataset_key == "GSM8K_Problems":
                 # GSM8K math problems ALWAYS need more tokens for complete multi-step reasoning
-                max_tokens = 150  # Increased to allow full reasoning chains regardless of question length
+                max_tokens = 150
             elif "Question:" in prompt and len(prompt) > 200:
                 # Other long questions
                 max_tokens = 150
             else:
                 max_tokens = 15
 
-            logger.info(f"Generating response: '{prompt[:50]}...' (max_tokens={max_tokens})")
+            logger.info(f"Generating with HuggingFace: '{prompt[:50]}...' (max_tokens={max_tokens})")
 
             # Tokenize input
             inputs = self.tokenizer(
@@ -508,9 +533,12 @@ class OpenVINO5BenchmarkTester:
                 max_length=300
             )
 
+            # Move to same device as model
+            inputs = {k: v.to(self.hf_model.device) for k, v in inputs.items()}
+
             # Generate
             with torch.no_grad():
-                outputs = self.ov_model.generate(
+                outputs = self.hf_model.generate(
                     inputs.input_ids,
                     attention_mask=inputs.attention_mask,
                     max_new_tokens=max_tokens,
@@ -529,7 +557,7 @@ class OpenVINO5BenchmarkTester:
                 if sequences.shape[1] > input_length:
                     new_tokens = sequences[0][input_length:]
                     response = self.tokenizer.decode(new_tokens, skip_special_tokens=True).strip()
-                    logger.info(f"Generated: '{response[:100]}...'")
+                    logger.info(f"✓ Generated: '{response[:100]}...'")
                     return response if response else "Empty"
                 else:
                     return "No new tokens"
@@ -546,7 +574,44 @@ class OpenVINO5BenchmarkTester:
                 return "Unknown output format"
 
         except Exception as e:
-            logger.error(f"Generation failed: {str(e)}")
+            logger.error(f"HF Generation failed: {str(e)}")
+            return f"ERROR: {str(e)}"
+
+    def generate_genai_response(self, prompt: str, max_tokens: int = 15, dataset_key: str = "") -> str:
+        """Generate response using OpenVINO GenAI pipeline"""
+        try:
+            # Adaptive token length based on task type and dataset
+            if "Code:" in prompt:
+                max_tokens = 50
+            elif dataset_key == "GSM8K_Problems":
+                # GSM8K math problems ALWAYS need more tokens for complete multi-step reasoning
+                max_tokens = 150
+            elif "Question:" in prompt and len(prompt) > 200:
+                # Other long questions
+                max_tokens = 150
+            else:
+                max_tokens = 15
+
+            logger.info(f"Generating with OpenVINO GenAI: '{prompt[:50]}...' (max_tokens={max_tokens})")
+
+            # Configure generation parameters
+            config = ov_genai.GenerationConfig()
+            config.max_new_tokens = max_tokens
+            config.do_sample = False
+            config.num_beams = 1
+
+            # Generate using GenAI pipeline
+            response = self.genai_pipe.generate(prompt, config)
+
+            # Extract only the new tokens (remove prompt)
+            if response.startswith(prompt):
+                response = response[len(prompt):].strip()
+
+            logger.info(f"✓ Generated: '{response[:100]}...'")
+            return response if response else "Empty"
+
+        except Exception as e:
+            logger.error(f"GenAI Generation failed: {str(e)}")
             return f"ERROR: {str(e)}"
 
     def validate_response(self, response: str, expected_patterns: list, dataset_key: str) -> bool:
@@ -562,7 +627,6 @@ class OpenVINO5BenchmarkTester:
                 pattern_str = str(pattern).strip()
 
                 # Strategy 1: Look for final answer indicators (most reliable)
-                # These patterns capture the number after conclusive statements
                 final_answer_patterns = [
                     r'(?:the\s+)?(?:answer|total|result|sum)\s+(?:is|equals?|=|:)\s*\$?\s*(\d+(?:\.\d+)?)',
                     r'(?:receives?|gets?|earns?|makes?|has|have)\s+(?:a\s+total\s+of\s+)?\$?\s*(\d+(?:\.\d+)?)\s*(?:dollars?|pens?|books?|apples?|euros?)?[\.,;\s]*$',
@@ -574,18 +638,15 @@ class OpenVINO5BenchmarkTester:
                 for final_pattern in final_answer_patterns:
                     matches = re.findall(final_pattern, response_lower, re.MULTILINE)
                     if matches:
-                        # Check if the expected answer is in the captured numbers
                         for match in matches:
                             if pattern_str == match or pattern_str in match:
                                 return True
 
                 # Strategy 2: Check last complete sentence for a number
-                # Split by periods, find the last sentence with a number
                 sentences = response.split('.')
                 for sentence in reversed(sentences):
                     sentence_numbers = re.findall(r'\b\d+(?:\.\d+)?\b', sentence)
                     if sentence_numbers:
-                        # The last number in the last sentence with numbers is likely the answer
                         if pattern_str == sentence_numbers[-1]:
                             return True
                         break
@@ -593,7 +654,6 @@ class OpenVINO5BenchmarkTester:
                 # Strategy 3: Check last few numbers in entire response
                 all_numbers = re.findall(r'\b\d+(?:\.\d+)?\b', response)
                 if all_numbers:
-                    # Check last 5 numbers (in case answer appears in final calculation)
                     last_numbers = all_numbers[-5:]
                     if pattern_str in last_numbers:
                         return True
@@ -625,7 +685,7 @@ class OpenVINO5BenchmarkTester:
         return False
 
     def test_dynamic_dataset(self, dataset_key: str) -> dict:
-        """Test a dataset with randomly sampled data"""
+        """Test a dataset with randomly sampled data - comparing HF vs GenAI"""
         config = self.loaded_datasets[dataset_key]["config"]
 
         logger.info(f"Testing dataset: {dataset_key}")
@@ -644,7 +704,8 @@ class OpenVINO5BenchmarkTester:
         print()
 
         results = []
-        correct = 0
+        hf_correct = 0
+        genai_correct = 0
 
         for i, sample in enumerate(random_samples, 1):
             print(f"Random Sample {i}/{len(random_samples)}: {config['category']}")
@@ -665,20 +726,28 @@ class OpenVINO5BenchmarkTester:
                 expected_display = str(sample['correct_answer'])[:100] + '...' if len(str(sample['correct_answer'])) > 100 else sample['correct_answer']
                 print(f"Expected: {expected_display}")
 
-            # Generate response
-            response = self.generate_response(formatted_question, dataset_key=dataset_key)
+            # Generate responses from both models
+            hf_response = self.generate_hf_response(formatted_question, dataset_key=dataset_key)
+            genai_response = self.generate_genai_response(formatted_question, dataset_key=dataset_key)
 
-            # Validate response
-            is_correct = self.validate_response(response, sample['expected_patterns'], dataset_key)
+            # Validate responses
+            hf_correct_flag = self.validate_response(hf_response, sample['expected_patterns'], dataset_key)
+            genai_correct_flag = self.validate_response(genai_response, sample['expected_patterns'], dataset_key)
 
-            if is_correct:
-                correct += 1
+            if hf_correct_flag:
+                hf_correct += 1
+            if genai_correct_flag:
+                genai_correct += 1
 
-            # Display result
-            response_display = response[:60] + '...' if len(response) > 60 else response
-            status = "PASS" if is_correct else "FAIL"
+            # Display results
+            hf_response_display = hf_response[:60] + '...' if len(hf_response) > 60 else hf_response
+            genai_response_display = genai_response[:60] + '...' if len(genai_response) > 60 else genai_response
 
-            print(f"  Response: '{response_display}' -> {status}")
+            hf_status = "PASS" if hf_correct_flag else "FAIL"
+            genai_status = "PASS" if genai_correct_flag else "FAIL"
+
+            print(f"  HF: '{hf_response_display}' -> {hf_status}")
+            print(f"  GenAI: '{genai_response_display}' -> {genai_status}")
             print()
 
             # Store detailed results
@@ -686,20 +755,27 @@ class OpenVINO5BenchmarkTester:
                 "sample_id": i,
                 "question": sample['question'],
                 "expected": sample['correct_answer'],
-                "response": response,
-                "correct": is_correct
+                "hf_response": hf_response,
+                "genai_response": genai_response,
+                "hf_correct": hf_correct_flag,
+                "genai_correct": genai_correct_flag
             })
 
         # Dataset summary
         total_samples = len(random_samples)
-        accuracy = (correct / total_samples) * 100
+        hf_accuracy = (hf_correct / total_samples) * 100
+        genai_accuracy = (genai_correct / total_samples) * 100
+        delta = genai_accuracy - hf_accuracy
 
         dataset_result = {
             "dataset_name": dataset_key,
             "category": config['category'],
             "total_samples": total_samples,
-            "correct": correct,
-            "accuracy": accuracy,
+            "hf_correct": hf_correct,
+            "genai_correct": genai_correct,
+            "hf_accuracy": hf_accuracy,
+            "genai_accuracy": genai_accuracy,
+            "delta": delta,
             "detailed_results": results,
             "source_info": {
                 "dataset_name": config["dataset_name"],
@@ -709,16 +785,18 @@ class OpenVINO5BenchmarkTester:
         }
 
         print(f"{config['name']} Random Sample Results:")
-        print(f"  OpenVINO: {correct}/{total_samples} ({accuracy:.1f}%)")
+        print(f"  HuggingFace: {hf_correct}/{total_samples} ({hf_accuracy:.1f}%)")
+        print(f"  OpenVINO GenAI: {genai_correct}/{total_samples} ({genai_accuracy:.1f}%)")
+        print(f"  Delta: {delta:+.1f}%")
         print(f"  Source: {total_samples}/{self.loaded_datasets[dataset_key]['total_samples']} randomly selected")
 
-        logger.info(f"Dataset {dataset_key} completed: Accuracy={accuracy:.1f}%")
+        logger.info(f"Dataset {dataset_key} completed: HF={hf_accuracy:.1f}%, GenAI={genai_accuracy:.1f}%, Delta={delta:+.1f}%")
 
         return dataset_result
 
     def measure_performance(self) -> dict:
-        """Measure comprehensive performance including token latency metrics"""
-        logger.info("Measuring OpenVINO model performance")
+        """Measure comprehensive performance for both models"""
+        logger.info("Measuring model performance")
 
         # Use diverse questions for performance testing
         perf_questions = [
@@ -729,59 +807,96 @@ class OpenVINO5BenchmarkTester:
             "Is the Earth flat? Answer:"
         ]
 
-        times = []
-        token_counts = []
-        token_latencies = []
+        hf_times = []
+        hf_token_counts = []
+        hf_token_latencies = []
+
+        genai_times = []
+        genai_token_counts = []
+        genai_token_latencies = []
 
         for i, question in enumerate(perf_questions):
             try:
+                # HuggingFace performance
                 start_time = time.perf_counter()
-                response = self.generate_response(question, max_tokens=12)
+                hf_response = self.generate_hf_response(question, max_tokens=12)
                 end_time = time.perf_counter()
 
                 duration = end_time - start_time
-                token_count = len(response.split()) if response and not response.startswith("ERROR") else 1
-
-                # Calculate token latency
+                token_count = len(hf_response.split()) if hf_response and not hf_response.startswith("ERROR") else 1
                 token_latency = (duration / token_count) * 1000 if token_count > 0 else 0
 
-                times.append(duration)
-                token_counts.append(token_count)
-                token_latencies.append(token_latency)
+                hf_times.append(duration)
+                hf_token_counts.append(token_count)
+                hf_token_latencies.append(token_latency)
 
-                logger.info(f"Performance run {i+1}: {duration:.2f}s, {token_count} tokens, {token_latency:.1f}ms/token")
+                logger.info(f"HF Performance run {i+1}: {duration:.2f}s, {token_count} tokens, {token_latency:.1f}ms/token")
 
             except Exception as e:
-                logger.warning(f"Performance run {i+1} failed: {e}")
-                times.append(5.0)
-                token_counts.append(1)
-                token_latencies.append(5000.0)
+                logger.warning(f"HF Performance run {i+1} failed: {e}")
+                hf_times.append(10.0)
+                hf_token_counts.append(1)
+                hf_token_latencies.append(10000.0)
+
+            try:
+                # GenAI performance
+                start_time = time.perf_counter()
+                genai_response = self.generate_genai_response(question, max_tokens=12)
+                end_time = time.perf_counter()
+
+                duration = end_time - start_time
+                token_count = len(genai_response.split()) if genai_response and not genai_response.startswith("ERROR") else 1
+                token_latency = (duration / token_count) * 1000 if token_count > 0 else 0
+
+                genai_times.append(duration)
+                genai_token_counts.append(token_count)
+                genai_token_latencies.append(token_latency)
+
+                logger.info(f"GenAI Performance run {i+1}: {duration:.2f}s, {token_count} tokens, {token_latency:.1f}ms/token")
+
+            except Exception as e:
+                logger.warning(f"GenAI Performance run {i+1} failed: {e}")
+                genai_times.append(5.0)
+                genai_token_counts.append(1)
+                genai_token_latencies.append(5000.0)
 
         # Calculate comprehensive metrics
-        avg_time = sum(times) / len(times)
-        avg_tokens = sum(token_counts) / len(token_counts)
-        throughput = avg_tokens / avg_time if avg_time > 0 else 0
-        avg_token_latency = sum(token_latencies) / len(token_latencies)
-        min_token_latency = min(token_latencies) if token_latencies else 0
-        max_token_latency = max(token_latencies) if token_latencies else 0
+        hf_avg_time = sum(hf_times) / len(hf_times)
+        hf_avg_tokens = sum(hf_token_counts) / len(hf_token_counts)
+        hf_throughput = hf_avg_tokens / hf_avg_time if hf_avg_time > 0 else 0
+        hf_avg_token_latency = sum(hf_token_latencies) / len(hf_token_latencies)
+
+        genai_avg_time = sum(genai_times) / len(genai_times)
+        genai_avg_tokens = sum(genai_token_counts) / len(genai_token_counts)
+        genai_throughput = genai_avg_tokens / genai_avg_time if genai_avg_time > 0 else 0
+        genai_avg_token_latency = sum(genai_token_latencies) / len(genai_token_latencies)
+
+        speedup = hf_avg_token_latency / genai_avg_token_latency if genai_avg_token_latency > 0 else 0
 
         return {
-            "avg_time": avg_time,
-            "avg_tokens": avg_tokens,
-            "throughput": throughput,
-            "ttft": times[0] if times else 0,
-            "token_latency": min_token_latency,
-            "avg_token_latency": avg_token_latency,
-            "max_token_latency": max_token_latency,
-            "all_token_latencies": token_latencies
+            "hf": {
+                "avg_time": hf_avg_time,
+                "avg_tokens": hf_avg_tokens,
+                "throughput": hf_throughput,
+                "ttft": hf_times[0] if hf_times else 0,
+                "token_latency": hf_avg_token_latency
+            },
+            "genai": {
+                "avg_time": genai_avg_time,
+                "avg_tokens": genai_avg_tokens,
+                "throughput": genai_throughput,
+                "ttft": genai_times[0] if genai_times else 0,
+                "token_latency": genai_avg_token_latency
+            },
+            "speedup": speedup
         }
 
-    def run_openvino_5benchmark_test(self):
-        """Run comprehensive 5-benchmark testing for OpenVINO model"""
+    def run_hf_vs_genai_5benchmark_test(self):
+        """Run comprehensive 5-benchmark testing comparing HF vs OpenVINO GenAI"""
         print("=" * 80)
-        print("OPENVINO 5-BENCHMARK DYNAMIC DATASET EVALUATION")
+        print("HUGGINGFACE vs OPENVINO GENAI 5-BENCHMARK COMPARISON")
         print("=" * 80)
-        print("OpenVINO model benchmarking on real datasets")
+        print("Compare HuggingFace model against OpenVINO GenAI optimized pipeline")
         print("Loading Real Datasets & Random Sampling Each Run")
         print("5 Comprehensive Benchmarks:")
         print("  • MMLU (Academic Knowledge)")
@@ -811,26 +926,28 @@ class OpenVINO5BenchmarkTester:
             return
 
         print("=" * 80)
-        print(f"OPENVINO 5-BENCHMARK TEST | Hardware: {self.device}")
+        print(f"HF vs GENAI 5-BENCHMARK TEST | Hardware: {self.device}")
         print("=" * 80)
-        print(f"OpenVINO Model: {os.path.basename(self.openvino_model_path)}")
+        print(f"HuggingFace Model: {self.hf_model_id}")
+        print(f"OpenVINO GenAI Model: {os.path.basename(self.openvino_model_path)}")
         print(f"Benchmarks: {len(self.loaded_datasets)} comprehensive capability areas")
 
-        # Load model
-        print("\nLoading OpenVINO model...")
+        # Load models
+        print("\nLoading models...")
         start_time = time.time()
 
-        if not self.load_model():
-            print("Failed to load model")
+        if not self.load_models():
+            print("Failed to load models")
             return
 
         load_time = time.time() - start_time
-        print(f"Model loaded in {load_time:.1f} seconds")
-        print(f"OpenVINO running on: {self.device}")
+        print(f"Models loaded in {load_time:.1f} seconds")
+        print(f"OpenVINO GenAI running on: {self.device}")
 
         # Test each dataset with random samples
         all_results = {}
-        total_correct = 0
+        hf_total_correct = 0
+        genai_total_correct = 0
         total_samples = 0
         category_results = {}
 
@@ -841,12 +958,14 @@ class OpenVINO5BenchmarkTester:
             # Track by category
             category = dataset_result['category']
             if category not in category_results:
-                category_results[category] = {'correct': 0, 'total': 0}
+                category_results[category] = {'hf_correct': 0, 'genai_correct': 0, 'total': 0}
 
-            category_results[category]['correct'] += dataset_result['correct']
+            category_results[category]['hf_correct'] += dataset_result['hf_correct']
+            category_results[category]['genai_correct'] += dataset_result['genai_correct']
             category_results[category]['total'] += dataset_result['total_samples']
 
-            total_correct += dataset_result['correct']
+            hf_total_correct += dataset_result['hf_correct']
+            genai_total_correct += dataset_result['genai_correct']
             total_samples += dataset_result['total_samples']
 
         # Performance measurement
@@ -854,31 +973,40 @@ class OpenVINO5BenchmarkTester:
         print("PERFORMANCE MEASUREMENT")
         print("=" * 60)
 
-        print("Measuring OpenVINO model performance...")
-        ov_perf = self.measure_performance()
+        print("Measuring performance for both models...")
+        perf_metrics = self.measure_performance()
 
         # Final comprehensive results
-        overall_accuracy = (total_correct / total_samples) * 100 if total_samples > 0 else 0
+        hf_overall_accuracy = (hf_total_correct / total_samples) * 100 if total_samples > 0 else 0
+        genai_overall_accuracy = (genai_total_correct / total_samples) * 100 if total_samples > 0 else 0
+        overall_delta = genai_overall_accuracy - hf_overall_accuracy
 
         print("\n" + "=" * 80)
-        print("COMPREHENSIVE 5-BENCHMARK OPENVINO RESULTS")
+        print("COMPREHENSIVE 5-BENCHMARK HF vs GENAI RESULTS")
         print("=" * 80)
 
-        print("MODEL EVALUATION:")
-        print(f"  OpenVINO Model: {os.path.basename(self.openvino_model_path)}")
+        print("MODEL COMPARISON:")
+        print(f"  HuggingFace Model: {self.hf_model_id}")
+        print(f"  OpenVINO GenAI Model: {os.path.basename(self.openvino_model_path)}")
         print(f"  Hardware: {self.device}")
         print(f"  Benchmarks: {len(self.loaded_datasets)} comprehensive capability areas")
         print()
 
         print(f"OVERALL 5-BENCHMARK ACCURACY ({total_samples} random samples total):")
-        print(f"  OpenVINO: {total_correct}/{total_samples} ({overall_accuracy:.1f}%)")
+        print(f"  HuggingFace: {hf_total_correct}/{total_samples} ({hf_overall_accuracy:.1f}%)")
+        print(f"  OpenVINO GenAI: {genai_total_correct}/{total_samples} ({genai_overall_accuracy:.1f}%)")
+        print(f"  Delta: {overall_delta:+.1f}%")
         print()
 
         print("CAPABILITY BREAKDOWN (By Category):")
         for category, results in category_results.items():
-            cat_accuracy = (results['correct'] / results['total']) * 100 if results['total'] > 0 else 0
+            hf_cat_accuracy = (results['hf_correct'] / results['total']) * 100 if results['total'] > 0 else 0
+            genai_cat_accuracy = (results['genai_correct'] / results['total']) * 100 if results['total'] > 0 else 0
+            cat_delta = genai_cat_accuracy - hf_cat_accuracy
             print(f"  {category}:")
-            print(f"    Accuracy: {results['correct']}/{results['total']} ({cat_accuracy:.1f}%)")
+            print(f"    HF: {results['hf_correct']}/{results['total']} ({hf_cat_accuracy:.1f}%)")
+            print(f"    GenAI: {results['genai_correct']}/{results['total']} ({genai_cat_accuracy:.1f}%)")
+            print(f"    Delta: {cat_delta:+.1f}%")
         print()
 
         print("DATASET BREAKDOWN (Random Samples):")
@@ -888,120 +1016,79 @@ class OpenVINO5BenchmarkTester:
             total_available = result['source_info']['total_available']
             print(f"  {config['name']} ({config['category']}):")
             print(f"    Random Selection: {samples_per_dataset}/{total_available} samples")
-            print(f"    Accuracy: {result['correct']}/{samples_per_dataset} ({result['accuracy']:.1f}%)")
+            print(f"    HF: {result['hf_correct']}/{samples_per_dataset} ({result['hf_accuracy']:.1f}%)")
+            print(f"    GenAI: {result['genai_correct']}/{samples_per_dataset} ({result['genai_accuracy']:.1f}%)")
+            print(f"    Delta: {result['delta']:+.1f}%")
         print()
 
         print("PERFORMANCE METRICS:")
-        print("  OpenVINO:")
-        print(f"    TTFT: {ov_perf['ttft']:.2f}s | Throughput: {ov_perf['throughput']:.1f} tok/s")
-        print(f"    Token Latency: {ov_perf['token_latency']:.1f}ms | Avg Token Latency: {ov_perf['avg_token_latency']:.1f}ms")
+        print(f"  HuggingFace: TTFT={perf_metrics['hf']['ttft']:.2f}s, Throughput={perf_metrics['hf']['throughput']:.1f} tok/s, TokenLatency={perf_metrics['hf']['token_latency']:.1f}ms")
+        print(f"  OpenVINO GenAI: TTFT={perf_metrics['genai']['ttft']:.2f}s, Throughput={perf_metrics['genai']['throughput']:.1f} tok/s, TokenLatency={perf_metrics['genai']['token_latency']:.1f}ms")
+        print(f"  GenAI Speedup: {perf_metrics['speedup']:.1f}x faster")
         print()
 
         # Production assessment
         accuracy_threshold = 70
 
-        if overall_accuracy >= accuracy_threshold:
-            verdict = "PRODUCTION READY"
-            recommendation = f"OpenVINO model shows {overall_accuracy:.1f}% accuracy across 5 benchmarks. Suitable for production deployment."
-        elif overall_accuracy >= 50:
-            verdict = "REQUIRES REVIEW"
-            recommendation = f"OpenVINO model shows {overall_accuracy:.1f}% accuracy across 5 benchmarks. Consider more extensive evaluation before production."
+        if genai_overall_accuracy >= accuracy_threshold:
+            verdict = " PRODUCTION READY"
+        elif genai_overall_accuracy >= 50:
+            verdict = " REQUIRES REVIEW"
         else:
-            verdict = "NEEDS IMPROVEMENT"
-            recommendation = f"OpenVINO model accuracy ({overall_accuracy:.1f}%) across 5 benchmarks below production threshold. Review quantization settings."
+            verdict = " NEEDS IMPROVEMENT"
 
-        print(f"PRODUCTION ASSESSMENT: {verdict}")
-        print(f"RECOMMENDATION: {recommendation}")
+        print(f"ASSESSMENT:{verdict}")
         print()
 
-        # COMPREHENSIVE SUMMARY
-        print("=" * 80)
-        print("COMPREHENSIVE 5-BENCHMARK SUMMARY")
-        print("=" * 80)
-        print("5-BENCHMARK EVALUATION OVERVIEW:")
-        print(f"  • OpenVINO Model: {os.path.basename(self.openvino_model_path)}")
-        print(f"  • Capability Areas: {len(self.loaded_datasets)} comprehensive benchmarks")
-        print(f"  • Random Samples Per Dataset: {self.samples_per_dataset}")
-        print(f"  • Total Random Test Cases: {total_samples}")
-        print(f"  • Hardware Used: {self.device}")
-        print("  • Fresh Random Selection Each Run")
-        print()
-
-        print("CAPABILITY-BY-CAPABILITY RESULTS:")
-        for category, results in category_results.items():
-            cat_accuracy = (results['correct'] / results['total']) * 100 if results['total'] > 0 else 0
-
-            print(f"   {category}:")
-            print(f"      Test Cases: {results['total']} random samples")
-            print(f"      Accuracy: {cat_accuracy:.1f}% ({results['correct']}/{results['total']})")
-            print()
-
-        print("DATASET-BY-DATASET RESULTS:")
-        for dataset_key, result in all_results.items():
-            config = self.loaded_datasets[dataset_key]["config"]
-
-            print(f"   {config['name']} ({config['category']}):")
-            print(f"      Source Dataset: {config['dataset_name']}")
-            print(f"      Available Samples: {result['source_info']['total_available']}")
-            print(f"      Random Selection: {result['total_samples']} samples")
-            print(f"      Accuracy: {result['accuracy']:.1f}% ({result['correct']}/{result['total_samples']})")
-            print()
-
-        print("OVERALL 5-BENCHMARK SUMMARY:")
-        print(f"  • Overall Accuracy: {overall_accuracy:.1f}% ({total_correct}/{total_samples})")
-        print(f"  • Performance: TTFT={ov_perf['ttft']:.2f}s, Throughput={ov_perf['throughput']:.1f} tok/s")
-        print(f"  • Token Latency: {ov_perf['avg_token_latency']:.1f}ms average")
-        print(f"  • Final Assessment: {verdict}")
-        print("  • 5-Benchmark Comprehensive Capability Coverage")
-        print("  • Random Sampling Ensures Unbiased Evaluation")
-        print("=" * 80)
-        print()
-
-        # Save comprehensive results
-        logger.info("=== COMPREHENSIVE 5-BENCHMARK OPENVINO RESULTS ===")
-        logger.info(f"OpenVINO Model: {self.openvino_model_path}")
+        # Log comprehensive summary
+        logger.info("=== COMPREHENSIVE 5-BENCHMARK HF vs GENAI RESULTS ===")
+        logger.info(f"HuggingFace Model: {self.hf_model_id}")
+        logger.info(f"OpenVINO GenAI Model: {self.openvino_model_path}")
         logger.info(f"Hardware: {self.device}")
         logger.info(f"Total Random Samples: {total_samples}")
-        logger.info(f"Overall Accuracy: {overall_accuracy:.1f}% ({total_correct}/{total_samples})")
+        logger.info(f"Overall: HF={hf_overall_accuracy:.1f}%, GenAI={genai_overall_accuracy:.1f}%, Delta={overall_delta:+.1f}%")
 
-        # Log capability-specific summary
         logger.info("=== 5-BENCHMARK CAPABILITY SUMMARY ===")
         for category, results in category_results.items():
-            cat_accuracy = (results['correct'] / results['total']) * 100 if results['total'] > 0 else 0
+            hf_cat_accuracy = (results['hf_correct'] / results['total']) * 100 if results['total'] > 0 else 0
+            genai_cat_accuracy = (results['genai_correct'] / results['total']) * 100 if results['total'] > 0 else 0
+            cat_delta = genai_cat_accuracy - hf_cat_accuracy
             logger.info(f"{category}: {results['total']} random samples")
-            logger.info(f"  Accuracy={cat_accuracy:.1f}%")
+            logger.info(f"  HF={hf_cat_accuracy:.1f}%, GenAI={genai_cat_accuracy:.1f}%, Delta={cat_delta:+.1f}%")
 
-        # Log dataset-specific summary
         logger.info("=== 5-BENCHMARK DATASET SUMMARY ===")
         for dataset_key, result in all_results.items():
             config = self.loaded_datasets[dataset_key]["config"]
             logger.info(f"{config['name']} ({config['dataset_name']}) - {config['category']}: {result['total_samples']}/{result['source_info']['total_available']} random samples")
-            logger.info(f"  Accuracy={result['accuracy']:.1f}%")
+            logger.info(f"  HF={result['hf_accuracy']:.1f}%, GenAI={result['genai_accuracy']:.1f}%, Delta={result['delta']:+.1f}%")
 
-        logger.info(f"Performance: TTFT={ov_perf['ttft']:.2f}s, Throughput={ov_perf['throughput']:.1f}, TokenLatency={ov_perf['avg_token_latency']:.1f}ms")
-        logger.info(f"Assessment: {verdict}")
+        logger.info(f"HF Performance: TTFT={perf_metrics['hf']['ttft']:.2f}s, Throughput={perf_metrics['hf']['throughput']:.1f}, TokenLatency={perf_metrics['hf']['token_latency']:.1f}ms")
+        logger.info(f"GenAI Performance: TTFT={perf_metrics['genai']['ttft']:.2f}s, Throughput={perf_metrics['genai']['throughput']:.1f}, TokenLatency={perf_metrics['genai']['token_latency']:.1f}ms")
+        logger.info(f"Token Latency Improvement: {perf_metrics['speedup']:.1f}x faster")
+        logger.info(f"Assessment:{verdict}")
 
         print(f"Complete results saved to: {self.log_file}")
-        print("5-Benchmark OpenVINO testing completed successfully")
+        print("5-Benchmark HF vs GenAI testing completed successfully")
         print("Run again for different random samples")
 
 
 def main():
     """Main execution"""
     try:
-        if not torch_available or not datasets_available:
+        if not torch_available or not genai_available or not datasets_available:
             print("Required libraries not available")
-            print("Please install: pip install datasets transformers optimum[openvino] torch")
+            print("Please install:")
+            print("  pip install torch transformers openvino-genai datasets")
             return
 
-        print("OPENVINO 5-BENCHMARK DYNAMIC DATASET MODEL TESTER")
-        print("Benchmark OpenVINO quantized models on real datasets")
+        print("HUGGINGFACE vs OPENVINO GENAI 5-BENCHMARK COMPARISON TESTER")
+        print("Compare HuggingFace models against OpenVINO GenAI pipeline")
         print("Real dataset loading with random sampling each run")
         print("Datasets: MMLU, GSM8K, HellaSwag, MBPP, TruthfulQA")
         print()
 
-        tester = OpenVINO5BenchmarkTester()
-        tester.run_openvino_5benchmark_test()
+        tester = General5BenchmarkHFvsGenAITester()
+        tester.run_hf_vs_genai_5benchmark_test()
 
     except KeyboardInterrupt:
         print("\nTest interrupted by user")

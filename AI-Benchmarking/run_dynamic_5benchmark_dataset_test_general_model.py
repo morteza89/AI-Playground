@@ -15,16 +15,7 @@ import json
 import re
 from datetime import datetime
 
-# Set up logging
-log_file = "general_5benchmark_dataset_test_results.log"
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler(log_file, encoding='utf-8'),
-        logging.StreamHandler()
-    ]
-)
+# Note: logging will be configured after model selection
 logger = logging.getLogger(__name__)
 
 try:
@@ -105,6 +96,30 @@ class General5BenchmarkDynamicDatasetTester:
 
         self.loaded_datasets = {}
         self.samples_per_dataset = 10  # Default
+        self.log_file = None  # Will be set after model selection
+
+    def setup_logging(self, model_name: str):
+        """Setup logging with organized output structure"""
+        # Create outputs directory structure
+        outputs_dir = os.path.join("outputs", model_name)
+        os.makedirs(outputs_dir, exist_ok=True)
+
+        # Set log file path
+        self.log_file = os.path.join(outputs_dir, "general_5benchmark_dataset_test_results.log")
+
+        # Configure logging
+        logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s - %(levelname)s - %(message)s',
+            handlers=[
+                logging.FileHandler(self.log_file, encoding='utf-8'),
+                logging.StreamHandler()
+            ],
+            force=True  # Override any existing configuration
+        )
+
+        logger.info(f"Logging initialized for model: {model_name}")
+        logger.info(f"Log file: {self.log_file}")
 
     def model_selection(self):
         """Get model selection from user"""
@@ -600,7 +615,7 @@ class General5BenchmarkDynamicDatasetTester:
         if dataset_key == "GSM8K_Problems":
             for pattern in expected_patterns:
                 pattern_str = str(pattern).strip()
-                
+
                 # Strategy 1: Look for final answer indicators (most reliable)
                 # These patterns capture the number after conclusive statements
                 final_answer_patterns = [
@@ -609,7 +624,7 @@ class General5BenchmarkDynamicDatasetTester:
                     r'total\s+(?:of\s+)?(?:is|equals?|=|:)?\s*\\?\[?\$?\s*(\d+(?:\.\d+)?)',
                     r'=\s*\$?\s*(\d+(?:\.\d+)?)\s*(?:dollars?|pens?|books?|apples?)?[\.,;\s]*$',
                 ]
-                
+
                 response_lower = response.lower()
                 for final_pattern in final_answer_patterns:
                     matches = re.findall(final_pattern, response_lower, re.MULTILINE)
@@ -618,7 +633,7 @@ class General5BenchmarkDynamicDatasetTester:
                         for match in matches:
                             if pattern_str == match or pattern_str in match:
                                 return True
-                
+
                 # Strategy 2: Check last complete sentence for a number
                 # Split by periods, find the last sentence with a number
                 sentences = response.split('.')
@@ -629,7 +644,7 @@ class General5BenchmarkDynamicDatasetTester:
                         if pattern_str == sentence_numbers[-1]:
                             return True
                         break
-                
+
                 # Strategy 3: Check last few numbers in entire response
                 all_numbers = re.findall(r'\b\d+(?:\.\d+)?\b', response)
                 if all_numbers:
@@ -637,11 +652,11 @@ class General5BenchmarkDynamicDatasetTester:
                     last_numbers = all_numbers[-5:]
                     if pattern_str in last_numbers:
                         return True
-                
+
                 # Strategy 4: Simple substring match (fallback)
                 if pattern_str in response:
                     return True
-            
+
             return False
 
         # Special validation for coding tasks
@@ -851,6 +866,10 @@ class General5BenchmarkDynamicDatasetTester:
         # Model configuration
         if not self.model_selection():
             return
+
+        # Setup logging with organized output structure
+        model_name = os.path.basename(self.openvino_model_path)
+        self.setup_logging(model_name)
 
         # Hardware selection
         self.hardware_selection()
@@ -1102,7 +1121,7 @@ class General5BenchmarkDynamicDatasetTester:
         logger.info(f"Token Latency Improvement: {hf_perf['avg_token_latency'] / ov_perf['avg_token_latency'] if ov_perf['avg_token_latency'] > 0 else 0:.1f}x faster")
         logger.info(f"Assessment: {verdict}")
 
-        print(f" Complete results saved to: {log_file}")
+        print(f" Complete results saved to: {self.log_file}")
         print(" 5-Benchmark dynamic dataset testing completed successfully!")
         print(" Run again for different random samples or try different models!")
         print(" Comprehensive capability evaluation across all major AI areas!")
